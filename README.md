@@ -19,7 +19,41 @@ const manifestPlugin = require('esbuild-plugin-manifest')
 esbuild.build({
     entryPoints: ['src/index.js'],
     bundle: true,
-    outfile: 'bundle.js',
+    outdir: 'output/',
     plugins: [manifestPlugin()],
 }).catch((e) => console.error(e.message))
 ```
+
+This will generate a `manifest.json` in the output directory with a mapping of all the source filenames to their corresponding hashed output filename:
+
+```json
+{
+  "src/index.js": "output/index-4QTUNIID.js"
+}
+```
+
+## Options
+
+### `options.hash`
+
+Type: `Boolean`
+
+Default: true
+
+By default we assume that you want to hash the output files. You can disable hashing by setting this to false or you can set your own hash format by directly using esbuild's `entryNames` option.
+
+### `options.shortNames`
+
+Type: `Boolean`
+
+Default: false
+
+By default we will use the full input and output paths `{"src/index.js":"src/index-4QTUNIID.js"}`, but when this option is enabled it will use the basename of the files `{"index.js":"index-4QTUNIID.js"}`
+
+### `options.filename`
+
+Type: `String`
+
+Default: `manifest.json`
+
+The name of the generated manifest file in the output directory.
