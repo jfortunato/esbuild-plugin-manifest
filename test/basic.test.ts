@@ -1,5 +1,6 @@
 import manifestPlugin from '../lib/index';
 import fs from 'fs';
+import rimraf from 'rimraf';
 
 const OUTPUT_MANIFEST = 'test/output/manifest.json';
 
@@ -18,7 +19,7 @@ function metafileContents(): {[key: string]: string} {
 };
 
 beforeEach(() => {
-  fs.rmSync('test/output', { recursive: true, force: true });
+  return new Promise(resolve => rimraf('test/output', resolve))
 });
 
 test('it returns a valid esbuild plugin interface', () => {
