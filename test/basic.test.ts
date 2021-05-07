@@ -111,7 +111,7 @@ test('it should put the manifest file in the outdir directory when outbase is sp
   expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(true);
 });
 
-test.only('it should throw an error when there are conflicting short names', async () => {
+test('it should throw an error when there are conflicting short names', async () => {
   expect.assertions(2);
 
   try {

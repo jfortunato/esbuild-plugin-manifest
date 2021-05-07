@@ -58,7 +58,14 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
       const filename = options.filename || 'manifest.json';
 
       return fs.promises.writeFile(`${outdir}/${filename}`,
-        JSON.stringify(Object.fromEntries(entryPoints), null, 2))
+        JSON.stringify(fromEntries(entryPoints), null, 2))
     });
   }
 });
+
+const fromEntries = (map: Map<string, string>): {[key: string]: string} => {
+  return Array.from(map).reduce((obj: {[key: string]: string}, [key, value]) => {
+    obj[key] = value;
+    return obj;
+  }, {});
+};

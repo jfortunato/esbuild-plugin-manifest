@@ -40,7 +40,7 @@ Type: `Boolean`
 
 Default: true
 
-By default we assume that you want to hash the output files. You can disable hashing by setting this to false or you can set your own hash format by directly using esbuild's `entryNames` option.
+By default we assume that you want to hash the output files. We use `[dir]/[name]-[hash]` as the default hash format. You can disable hashing by setting this to false or you can set your own hash format by directly using esbuild's `entryNames` option.
 
 ### `options.shortNames`
 
