@@ -1,5 +1,7 @@
 # esbuild-plugin-manifest
 
+![Node.js CI](https://github.com/jfortunato/esbuild-plugin-manifest/workflows/Node.js%20CI/badge.svg)
+
 This plugin will generate a manifest.json file, mapping original asset names to their corresponding output name.
 
 ## Install
