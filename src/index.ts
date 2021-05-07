@@ -39,6 +39,13 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
 
         const dest = options.shortNames === true ? path.basename(outputFilename) : outputFilename;
 
+        // When shortNames are enabled, there can be conflicting filenames.
+        // For example in the entry points are ['src/pages/home/index.js', 'src/pages/about/index.js'] both of the
+        // short names will be 'index.js'. We'll just throw an error if a conflict is detected.
+        if (options.shortNames === true && entryPoints.has(src)) {
+          throw new Error(`There is a conflicting shortName for '${src}'.`);
+        }
+
         entryPoints.set(src, dest);
       }
 

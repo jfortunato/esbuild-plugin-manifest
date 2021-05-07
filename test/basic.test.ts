@@ -90,12 +90,35 @@ test('it should use the same directory as the outfile if no outdir was given', a
 });
 
 test('it should throw an error if building without an outdir or outfile', async () => {
-  let caughtError;
+  expect.assertions(1);
 
-  await require('esbuild').build(buildOptions({}, {outdir: undefined, outfile: undefined}))
-    .catch((e: Error) => caughtError = e);
-
-  expect(caughtError).toBeInstanceOf(Error);
+  try {
+    await require('esbuild').build(buildOptions({}, {outdir: undefined, outfile: undefined}));
+  } catch (e) {
+    expect(e.message).toMatch(/outdir/);
+  }
 });
 
-// how to handle conflicting short names
+test('it should put the manifest file in the base directory when subdirectories are generated in the outdir', async () => {
+  await require('esbuild').build(buildOptions({}, {entryPoints: ['test/input/pages/home/index.js', 'test/input/pages/about/index.js']}));
+
+  expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(true);
+});
+
+test('it should put the manifest file in the outdir directory when outbase is specified', async () => {
+  await require('esbuild').build(buildOptions({}, {outbase: 'test', entryPoints: ['test/input/pages/home/index.js', 'test/input/pages/about/index.js']}));
+
+  expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(true);
+});
+
+test.only('it should throw an error when there are conflicting short names', async () => {
+  expect.assertions(2);
+
+  try {
+    await require('esbuild').build(buildOptions({shortNames: true}, {entryPoints: ['test/input/pages/home/index.js', 'test/input/pages/about/index.js']}));
+  } catch (e) {
+    expect(e.message).toMatch(/conflicting/);
+  }
+
+  expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(false);
+});
