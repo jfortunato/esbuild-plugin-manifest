@@ -46,34 +46,34 @@ test('it should generate the manifest.json in the outdir', async () => {
 });
 
 test('it should generate hashed filenames by default', async () => {
-  await require('esbuild').build(buildOptions());
+  await require('esbuild').build(buildOptions({shortNames: true}));
 
   expect(metafileContents()['example.js']).toMatch(/^example-[^\.]+\.js$/);
 });
 
 test('it should not have an opinion on hashes when a flag is set', async () => {
-  await require('esbuild').build(buildOptions({hash: false}));
+  await require('esbuild').build(buildOptions({shortNames: true, hash: false}));
 
   expect(metafileContents()['example.js']).toBe('example.js');
 });
 
 test('it should not override the hashing format if one was supplied already', async () => {
   // our internal hash format uses a '-' instead of a '.'
-  await require('esbuild').build(buildOptions({}, {entryNames: '[dir]/[name].[hash]'}));
+  await require('esbuild').build(buildOptions({shortNames: true}, {entryNames: '[dir]/[name].[hash]'}));
 
   expect(metafileContents()['example.js']).toMatch(/^example\.[^\.]+\.js$/);
 });
 
-test('it should generate short names by default', async () => {
+test('it should generate long names by default', async () => {
   await require('esbuild').build(buildOptions({hash: false}));
 
-  expect(metafileContents()).toMatchObject({'example.js': 'example.js'});
+  expect(metafileContents()).toMatchObject({'test/input/example.js': 'test/output/example.js'});
 });
 
-test('it should generate long names if specified', async () => {
-  await require('esbuild').build(buildOptions({hash: false, shortNames: false}));
+test('it should generate short names if specified', async () => {
+  await require('esbuild').build(buildOptions({hash: false, shortNames: true}));
 
-  expect(metafileContents()).toMatchObject({'test/input/example.js': 'test/output/example.js'});
+  expect(metafileContents()).toMatchObject({'example.js': 'example.js'});
 });
 
 test('it should generate a different filename if specified', async () => {

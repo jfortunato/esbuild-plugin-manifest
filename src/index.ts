@@ -35,9 +35,9 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
           continue;
         }
 
-        const src = options.shortNames !== false ? path.basename(outputInfo.entryPoint) : outputInfo.entryPoint;
+        const src = options.shortNames === true ? path.basename(outputInfo.entryPoint) : outputInfo.entryPoint;
 
-        const dest = options.shortNames !== false ? path.basename(outputFilename) : outputFilename;
+        const dest = options.shortNames === true ? path.basename(outputFilename) : outputFilename;
 
         entryPoints.set(src, dest);
       }
