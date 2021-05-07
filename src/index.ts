@@ -5,6 +5,7 @@ import path from 'path';
 interface ManifestPluginOptions {
   hash?: boolean;
   shortNames?: boolean;
+  filename?: string;
 }
 
 export = (options: ManifestPluginOptions = {}): Plugin => ({
@@ -41,13 +42,15 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         entryPoints.set(src, dest);
       }
 
-      if (build.initialOptions.outdir === undefined) {
+      if (build.initialOptions.outdir === undefined && build.initialOptions.outfile === undefined) {
         throw new Error("You must specify an 'outdir' when generating a manifest file.");
       }
 
-      const outdir = build.initialOptions.outdir;
+      const outdir = build.initialOptions.outdir || path.dirname(build.initialOptions.outfile!);
 
-      return fs.promises.writeFile(`${outdir}/manifest.json`,
+      const filename = options.filename || 'manifest.json';
+
+      return fs.promises.writeFile(`${outdir}/${filename}`,
         JSON.stringify(Object.fromEntries(entryPoints), null, 2))
     });
   }

@@ -76,18 +76,26 @@ test('it should generate long names if specified', async () => {
   expect(metafileContents()).toMatchObject({'test/input/example.js': 'test/output/example.js'});
 });
 
-test('it should throw an error if building without an outdir', async () => {
+test('it should generate a different filename if specified', async () => {
+  await require('esbuild').build(buildOptions({filename: 'example.json'}));
+
+  expect(fs.existsSync('test/output/example.json')).toBe(true);
+  expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(false);
+});
+
+test('it should use the same directory as the outfile if no outdir was given', async () => {
+  await require('esbuild').build(buildOptions({}, {outdir: undefined, outfile: 'test/output/out.js'}));
+
+  expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(true);
+});
+
+test('it should throw an error if building without an outdir or outfile', async () => {
   let caughtError;
 
-  await require('esbuild').build({
-    entryPoints: ['test/input/example.js'],
-    outfile: 'test/output/out.js',
-    plugins: [manifestPlugin()],
-  }).catch((e: Error) => caughtError = e);
+  await require('esbuild').build(buildOptions({}, {outdir: undefined, outfile: undefined}))
+    .catch((e: Error) => caughtError = e);
 
   expect(caughtError).toBeInstanceOf(Error);
 });
 
-// TODO filename option
-// how to handle when outdir is not specified
 // how to handle conflicting short names
