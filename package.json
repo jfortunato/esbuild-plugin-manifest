@@ -1,6 +1,6 @@
 {
   "name": "esbuild-plugin-manifest",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Plugin for esbuild to generate asset manifest.json file",
   "keywords": [
     "esbuild",
