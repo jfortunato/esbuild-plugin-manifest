@@ -123,3 +123,33 @@ test('it should throw an error when there are conflicting short names', async ()
 
   expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(false);
 });
+
+test('it should allow an extensionless input', async () => {
+  await require('esbuild').build(buildOptions({hash: false, extensionless: 'input'}));
+
+  expect(metafileContents()).toMatchObject({'test/input/example': 'test/output/example.js'});
+});
+
+test('it should allow an extensionless output', async () => {
+  await require('esbuild').build(buildOptions({hash: false, extensionless: 'output'}));
+
+  expect(metafileContents()).toMatchObject({'test/input/example.js': 'test/output/example'});
+});
+
+test('it should allow an extensionless input and output by specifying true', async () => {
+  await require('esbuild').build(buildOptions({hash: false, extensionless: true}));
+
+  expect(metafileContents()).toMatchObject({'test/input/example': 'test/output/example'});
+});
+
+test('it should allow an extensionless input with shortnames', async () => {
+  await require('esbuild').build(buildOptions({hash: false, shortNames: true, extensionless: 'input'}));
+
+  expect(metafileContents()).toMatchObject({'example': 'example.js'});
+});
+
+test('it should allow an extensionless output with shortnames', async () => {
+  await require('esbuild').build(buildOptions({hash: false, shortNames: true, extensionless: 'output'}));
+
+  expect(metafileContents()).toMatchObject({'example.js': 'example'});
+});

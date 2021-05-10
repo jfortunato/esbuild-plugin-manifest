@@ -50,7 +50,15 @@ Type: `Boolean`
 
 Default: false
 
-By default we will use the full input and output paths `{"src/index.js":"src/index-4QTUNIID.js"}`, but when this option is enabled it will use the basename of the files `{"index.js":"index-4QTUNIID.js"}`
+By default we will use the full input and output paths `{"src/index.js":"output/index-4QTUNIID.js"}`, but when this option is enabled it will use the basename of the files `{"index.js":"index-4QTUNIID.js"}`
+
+### `options.extensionless`
+
+Type: `Boolean` | `'input'` | `'output'`
+
+Default: false
+
+We'll keep all file extensions by default, but you can specify `true` to remove them from both or one of `'input'` or `'output'` to only remove them from the input or output respectively. Eg: specifying `manifestPlugin({ extensionless: 'input' })` will result in `{"src/index":"output/index-4QTUNIID.js"}`
 
 ### `options.filename`
 
