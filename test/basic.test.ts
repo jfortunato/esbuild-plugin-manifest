@@ -77,6 +77,46 @@ test('it should generate short names if specified', async () => {
   expect(metafileContents()).toMatchObject({'example.js': 'example.js'});
 });
 
+test('it should allow a short name for the input only', async () => {
+  await require('esbuild').build(buildOptions({hash: false, shortNames: 'input'}));
+
+  expect(metafileContents()).toMatchObject({'example.js': 'test/output/example.js'});
+});
+
+test('it should allow a short name for the output only', async () => {
+  await require('esbuild').build(buildOptions({hash: false, shortNames: 'output'}));
+
+  expect(metafileContents()).toMatchObject({'test/input/example.js': 'example.js'});
+});
+
+test('it should throw an error when there are conflicting short names', async () => {
+  expect.assertions(2);
+
+  try {
+    await require('esbuild').build(buildOptions({shortNames: true}, {entryPoints: ['test/input/pages/home/index.js', 'test/input/pages/about/index.js']}));
+  } catch (e) {
+    expect(e.message).toMatch(/conflicting/);
+  }
+
+  expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(false);
+});
+
+test('it should not throw an error if the short name has a different extension', async () => {
+  await require('esbuild').build(buildOptions({hash: false, shortNames: true}, {entryPoints: ['test/input/pages/home/index.js', 'test/input/pages/about/index.ts']}));
+
+  expect(metafileContents()).toMatchObject({'index.js': 'index.js', 'index.ts': 'index.js'});
+});
+
+test('it should throw an error if the shortname has a different extension but extensionless was also specified', async () => {
+  try {
+    await require('esbuild').build(buildOptions({hash: false, shortNames: true, extensionless: true}, {entryPoints: ['test/input/pages/home/index.js', 'test/input/pages/about/index.ts']}));
+  } catch (e) {
+    expect(e.message).toMatch(/conflicting/);
+  }
+
+  expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(false);
+});
+
 test('it should generate a different filename if specified', async () => {
   await require('esbuild').build(buildOptions({filename: 'example.json'}));
 
@@ -110,18 +150,6 @@ test('it should put the manifest file in the outdir directory when outbase is sp
   await require('esbuild').build(buildOptions({}, {outbase: 'test', entryPoints: ['test/input/pages/home/index.js', 'test/input/pages/about/index.js']}));
 
   expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(true);
-});
-
-test('it should throw an error when there are conflicting short names', async () => {
-  expect.assertions(2);
-
-  try {
-    await require('esbuild').build(buildOptions({shortNames: true}, {entryPoints: ['test/input/pages/home/index.js', 'test/input/pages/about/index.js']}));
-  } catch (e) {
-    expect(e.message).toMatch(/conflicting/);
-  }
-
-  expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(false);
 });
 
 test('it should allow an extensionless input', async () => {

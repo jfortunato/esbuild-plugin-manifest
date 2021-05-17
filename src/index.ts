@@ -6,7 +6,7 @@ type OptionValue = boolean | 'input' | 'output';
 
 interface ManifestPluginOptions {
   hash?: boolean;
-  shortNames?: boolean;
+  shortNames?: OptionValue;
   filename?: string;
   extensionless?: OptionValue;
 }
@@ -38,9 +38,17 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
           continue;
         }
 
-        let input = options.shortNames === true ? path.basename(outputInfo.entryPoint) : outputInfo.entryPoint;
+        let input = outputInfo.entryPoint;
 
-        let output = options.shortNames === true ? path.basename(outputFilename) : outputFilename;
+        let output = outputFilename;
+
+        // check if the shortNames option is being used on the input or output
+        input = shouldModify('input', options.shortNames) ? shortName(input) : input;
+        output = shouldModify('output', options.shortNames) ? shortName(output) : output;
+
+        // check if the extensionless option is being used on the input or output
+        input = shouldModify('input', options.extensionless) ? extensionless(input) : input;
+        output = shouldModify('output', options.extensionless) ? extensionless(output) : output;
 
         // When shortNames are enabled, there can be conflicting filenames.
         // For example if the entry points are ['src/pages/home/index.js', 'src/pages/about/index.js'] both of the
@@ -48,10 +56,6 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         if (options.shortNames === true && entryPoints.has(input)) {
           throw new Error(`There is a conflicting shortName for '${input}'.`);
         }
-
-        // check if the extensionless option is being used on the input or output
-        input = shouldModify('input', options.extensionless) ? extensionless(input) : input;
-        output = shouldModify('output', options.extensionless) ? extensionless(output) : output;
 
         entryPoints.set(input, output);
       }
@@ -72,6 +76,10 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
 
 const shouldModify = (inputOrOutput: 'input'|'output', optionValue?: OptionValue): boolean => {
   return optionValue === inputOrOutput || optionValue === true;
+};
+
+const shortName = (value: string): string => {
+  return path.basename(value);
 };
 
 const extensionless = (value: string): string => {
