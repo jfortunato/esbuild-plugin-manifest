@@ -107,7 +107,22 @@ test('it should not throw an error if the short name has a different extension',
   expect(metafileContents()).toMatchObject({'index.js': 'index.js', 'index.ts': 'index.js'});
 });
 
+test.only('it should throw an error if there are conflicting outputs when the shortNames option is used', async () => {
+  expect.assertions(2);
+
+  try {
+    await require('esbuild').build(buildOptions({hash: false, shortNames: 'output'}, {entryPoints: ['test/input/pages/about/index.js', 'test/input/pages/about/index.ts']}));
+  } catch (e) {
+    // esbuild itself should throw an error
+    expect(e.message).toMatch(/share the same path/);
+  }
+
+  expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(false);
+});
+
 test('it should throw an error if the shortname has a different extension but extensionless was also specified', async () => {
+  expect.assertions(2);
+
   try {
     await require('esbuild').build(buildOptions({hash: false, shortNames: true, extensionless: true}, {entryPoints: ['test/input/pages/home/index.js', 'test/input/pages/about/index.ts']}));
   } catch (e) {
