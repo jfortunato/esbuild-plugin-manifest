@@ -9,6 +9,7 @@ function buildOptions(pluginOptions = {}, overrideBuildOptions = {}) {
     entryPoints: ['test/input/example.js'],
     outdir: 'test/output',
     plugins: [manifestPlugin(pluginOptions)],
+    bundle: true,
   }
 
   return {...defaultBuildOptions, ...overrideBuildOptions};
@@ -96,7 +97,7 @@ test('it should throw an error if building without an outdir or outfile', async 
   try {
     await require('esbuild').build(buildOptions({}, {outdir: undefined, outfile: undefined}));
   } catch (e) {
-    expect(e.message).toMatch(/outdir/);
+    expect(e.message).toMatch(/output/);
   }
 });
 
@@ -127,7 +128,7 @@ test('it should throw an error when there are conflicting short names', async ()
 test('it should allow an extensionless input', async () => {
   await require('esbuild').build(buildOptions({hash: false, extensionless: 'input'}));
 
-  expect(metafileContents()).toMatchObject({'test/input/example': 'test/output/example.js'});
+  expect(metafileContents()).toMatchObject({'test/input/example': 'test/output/example.js',});
 });
 
 test('it should allow an extensionless output', async () => {
