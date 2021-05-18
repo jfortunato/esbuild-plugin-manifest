@@ -1,10 +1,5 @@
 import {
-  BuildResult, Metafile,
-  OnLoadArgs,
-  OnLoadOptions, OnLoadResult,
-  OnResolveArgs,
-  OnResolveOptions, OnResolveResult,
-  OnStartResult,
+  Metafile,
   Plugin,
   PluginBuild
 } from 'esbuild';
@@ -150,33 +145,3 @@ const fromEntries = (map: Map<string, string>): {[key: string]: string} => {
     return obj;
   }, {});
 };
-
-(() => {
-  const plugin = Plugin({})
-
-  const build:PluginBuild = {
-    initialOptions: {
-      outdir: "build2"
-    },
-    onEnd(callback: (result: BuildResult) => (void | Promise<void>)): void {
-      callback({
-        errors: [], warnings: [],
-        metafile: JSON.parse(fs.readFileSync("/home/richard/Projects/skil/eportal/public/build2/meta.json").toString())
-      })
-    },
-    onLoad(options: OnLoadOptions, callback: (args: OnLoadArgs) => (OnLoadResult | Promise<OnLoadResult | null | undefined> | null | undefined)): void {
-      callback({namespace: "", path: "", pluginData: undefined})
-      console.log(options)
-    },
-    onResolve(options: OnResolveOptions, callback: (args: OnResolveArgs) => (OnResolveResult | Promise<OnResolveResult | null | undefined> | null | undefined)): void {
-      console.log(options)
-      callback({importer: "", kind: 'entry-point', namespace: "", path: "", pluginData: undefined, resolveDir: ""})
-    },
-    onStart(callback: () => (OnStartResult | void | Promise<OnStartResult | void | null> | null)): void {
-      callback()
-    }
-
-  };
-
-  plugin.setup(build)
-})()
