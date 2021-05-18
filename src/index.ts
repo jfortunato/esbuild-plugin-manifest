@@ -1,4 +1,13 @@
-import {Plugin, PluginBuild} from 'esbuild';
+import {
+  BuildResult, Metafile,
+  OnLoadArgs,
+  OnLoadOptions, OnLoadResult,
+  OnResolveArgs,
+  OnResolveOptions, OnResolveResult,
+  OnStartResult,
+  Plugin,
+  PluginBuild
+} from 'esbuild';
 import fs from 'fs';
 import path from 'path';
 
@@ -11,7 +20,7 @@ interface ManifestPluginOptions {
   extensionless?: OptionValue;
 }
 
-export = (options: ManifestPluginOptions = {}): Plugin => ({
+let Plugin = (options: ManifestPluginOptions = {}): Plugin => ({
   name: 'manifest',
   setup(build: PluginBuild) {
     build.initialOptions.metafile = true;
@@ -30,16 +39,8 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         throw new Error("Expected metafile, but it does not exist.");
       }
 
-      for (const outputFilename in result.metafile.outputs) {
-        const outputInfo = result.metafile.outputs[outputFilename]!;
-
-        // skip all outputs that don't have an entrypoint
-        if (outputInfo.entryPoint === undefined) {
-          continue;
-        }
-
-        let input = options.shortNames === true ? path.basename(outputInfo.entryPoint) : outputInfo.entryPoint;
-
+      const addEntrypoint = (entryPoint: string, outputFilename: string) => {
+        let input = options.shortNames === true ? path.basename(entryPoint) : entryPoint;
         let output = options.shortNames === true ? path.basename(outputFilename) : outputFilename;
 
         // When shortNames are enabled, there can be conflicting filenames.
@@ -56,6 +57,51 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         entryPoints.set(input, output);
       }
 
+      for (const outputFilename in result.metafile.outputs) {
+        const outputInfo = result.metafile.outputs[outputFilename]!;
+
+        // skip all outputs that don't have an entrypoint
+        if (outputInfo.entryPoint === undefined) {
+          const possibleEntryPoints = new Array<string>();
+
+          Object.keys(outputInfo.inputs).forEach(inputFilename => {
+            const possibleNewEntrypoint = findEntryPoint(result.metafile, inputFilename)
+            if (!possibleNewEntrypoint)
+              return
+
+            if (possibleEntryPoints.includes(possibleNewEntrypoint))
+              return;
+
+            possibleEntryPoints.push(possibleNewEntrypoint)
+          })
+
+          if (possibleEntryPoints.length > 1) {
+            possibleEntryPoints.slice(1).forEach(entrypoint => {
+              const extension = outputFilename.split('.').pop()
+              let newEntrypoint = entrypoint.split('.').slice(0, -1).join('.')
+              newEntrypoint = newEntrypoint + "." + extension
+              addEntrypoint(newEntrypoint, outputFilename);
+            })
+          }
+
+          let newEntrypoint = possibleEntryPoints[0]
+          if (!newEntrypoint) {
+            continue;
+          }
+
+          const extension = outputFilename.split('.').pop()
+          newEntrypoint = newEntrypoint.split('.').slice(0, -1).join('.')
+          newEntrypoint = newEntrypoint + "." + extension
+
+          outputInfo.entryPoint = newEntrypoint
+        }
+
+        if (!outputInfo.entryPoint) {
+          continue;
+        }
+        addEntrypoint(outputInfo.entryPoint, outputFilename);
+      }
+
       if (build.initialOptions.outdir === undefined && build.initialOptions.outfile === undefined) {
         throw new Error("You must specify an 'outdir' when generating a manifest file.");
       }
@@ -69,6 +115,7 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
     });
   }
 });
+export = Plugin;
 
 const shouldModify = (inputOrOutput: 'input'|'output', optionValue?: OptionValue): boolean => {
   return optionValue === inputOrOutput || optionValue === true;
@@ -82,9 +129,54 @@ const extensionless = (value: string): string => {
   return `${dir}${parsed.name}`;
 };
 
+const findEntryPoint = (metafile: Metafile|undefined, inputName: string): string|undefined => {
+  // @ts-ignore
+  for (let [outputFilename, outputObject] of Object.entries(metafile.outputs)) {
+    if (Object.keys(outputObject.inputs).includes(inputName)) {
+      if (outputObject.entryPoint)
+        return outputObject.entryPoint
+
+      return findEntryPoint(metafile, outputFilename)
+
+    }
+  }
+
+  return undefined
+}
+
 const fromEntries = (map: Map<string, string>): {[key: string]: string} => {
   return Array.from(map).reduce((obj: {[key: string]: string}, [key, value]) => {
     obj[key] = value;
     return obj;
   }, {});
 };
+
+(() => {
+  const plugin = Plugin({})
+
+  const build:PluginBuild = {
+    initialOptions: {
+      outdir: "build2"
+    },
+    onEnd(callback: (result: BuildResult) => (void | Promise<void>)): void {
+      callback({
+        errors: [], warnings: [],
+        metafile: JSON.parse(fs.readFileSync("/home/richard/Projects/skil/eportal/public/build2/meta.json").toString())
+      })
+    },
+    onLoad(options: OnLoadOptions, callback: (args: OnLoadArgs) => (OnLoadResult | Promise<OnLoadResult | null | undefined> | null | undefined)): void {
+      callback({namespace: "", path: "", pluginData: undefined})
+      console.log(options)
+    },
+    onResolve(options: OnResolveOptions, callback: (args: OnResolveArgs) => (OnResolveResult | Promise<OnResolveResult | null | undefined> | null | undefined)): void {
+      console.log(options)
+      callback({importer: "", kind: 'entry-point', namespace: "", path: "", pluginData: undefined, resolveDir: ""})
+    },
+    onStart(callback: () => (OnStartResult | void | Promise<OnStartResult | void | null> | null)): void {
+      callback()
+    }
+
+  };
+
+  plugin.setup(build)
+})()
