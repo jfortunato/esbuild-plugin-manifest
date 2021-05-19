@@ -1,4 +1,4 @@
-import manifestPlugin from '../lib/index';
+import manifestPlugin from '../src/index';
 import fs from 'fs';
 import rimraf from 'rimraf';
 
@@ -97,7 +97,7 @@ test('it should throw an error if building without an outdir or outfile', async 
   try {
     await require('esbuild').build(buildOptions({}, {outdir: undefined, outfile: undefined}));
   } catch (e) {
-    expect(e.message).toMatch(/output/);
+    expect(e.message).toMatch(/outdir/);
   }
 });
 
@@ -123,6 +123,19 @@ test('it should throw an error when there are conflicting short names', async ()
   }
 
   expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(false);
+});
+
+test('it should allow multiple entrypoints with same css', async () => {
+  await require('esbuild').build(buildOptions({hash: false},{
+    entryPoints: ['test/input/cssBundles/example.js', 'test/input/cssBundles/example2.js']
+  }));
+
+  expect(metafileContents()).toMatchObject({
+    "test/input/cssBundles/example.js": "test/output/example.js",
+    "test/input/cssBundles/example.css": "test/output/example2.css",
+    "test/input/cssBundles/example2.js": "test/output/example2.js",
+    "test/input/cssBundles/example2.css": "test/output/example2.css",
+  });
 });
 
 test('it should allow an extensionless input', async () => {
