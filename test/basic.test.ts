@@ -127,14 +127,14 @@ test('it should throw an error when there are conflicting short names', async ()
 
 test('it should allow multiple entrypoints with same css', async () => {
   await require('esbuild').build(buildOptions({hash: false},{
-    entryPoints: ['test/input/cssBundles/example.js', 'test/input/cssBundles/example2.js']
+    entryPoints: ['test/input/example-with-css/example.js', 'test/input/example-with-css/example2.js']
   }));
 
   expect(metafileContents()).toMatchObject({
-    "test/input/cssBundles/example.js": "test/output/example.js",
-    "test/input/cssBundles/example.css": "test/output/example2.css",
-    "test/input/cssBundles/example2.js": "test/output/example2.js",
-    "test/input/cssBundles/example2.css": "test/output/example2.css",
+    "test/input/example-with-css/example.js": "test/output/example.js",
+    "test/input/example-with-css/example.css": "test/output/example2.css",
+    "test/input/example-with-css/example2.js": "test/output/example2.js",
+    "test/input/example-with-css/example2.css": "test/output/example2.css",
   });
 });
 
