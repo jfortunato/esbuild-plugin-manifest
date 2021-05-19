@@ -51,12 +51,6 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
           throw new Error(`There is a conflicting shortName for '${input}'.`);
         }
 
-
-
-        // check if the extensionless option is being used on the input or output
-        input = shouldModify('input', options.extensionless) ? extensionless(input) : input;
-        output = shouldModify('output', options.extensionless) ? extensionless(output) : output;
-
         if (entryPoints.has(input)) {
         //  throw new Error(`There is a conflicting input for '${input}' (entrypoint: '${output}').`);
         }
