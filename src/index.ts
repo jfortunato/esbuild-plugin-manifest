@@ -1,4 +1,8 @@
-import {Plugin, PluginBuild} from 'esbuild';
+import {
+  Metafile,
+  Plugin,
+  PluginBuild
+} from 'esbuild';
 import fs from 'fs';
 import path from 'path';
 
@@ -30,21 +34,10 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         throw new Error("Expected metafile, but it does not exist.");
       }
 
-      for (const outputFilename in result.metafile.outputs) {
-        const outputInfo = result.metafile.outputs[outputFilename]!;
-
-        // skip all outputs that don't have an entrypoint
-        if (outputInfo.entryPoint === undefined) {
-          continue;
-        }
-
-        let input = outputInfo.entryPoint;
-
-        let output = outputFilename;
-
+      const addEntrypoint = (entryPoint: string, outputFilename: string) => {
         // check if the shortNames option is being used on the input or output
-        input = shouldModify('input', options.shortNames) ? shortName(input) : input;
-        output = shouldModify('output', options.shortNames) ? shortName(output) : output;
+        let input = shouldModify('input', options.shortNames) ? shortName(entryPoint) : entryPoint;
+        let output = shouldModify('output', options.shortNames) ? shortName(outputFilename) : outputFilename;
 
         // check if the extensionless option is being used on the input or output
         input = shouldModify('input', options.extensionless) ? extensionless(input) : input;
@@ -53,11 +46,44 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         // When shortNames are enabled, there can be conflicting filenames.
         // For example if the entry points are ['src/pages/home/index.js', 'src/pages/about/index.js'] both of the
         // short names will be 'index.js'. We'll just throw an error if a conflict is detected.
+        //TODO: This should also fail when it's running extensionless and bundles CSS
         if (options.shortNames === true && entryPoints.has(input)) {
           throw new Error(`There is a conflicting shortName for '${input}'.`);
         }
 
+
+
+        // check if the extensionless option is being used on the input or output
+        input = shouldModify('input', options.extensionless) ? extensionless(input) : input;
+        output = shouldModify('output', options.extensionless) ? extensionless(output) : output;
+
+        if (entryPoints.has(input)) {
+        //  throw new Error(`There is a conflicting input for '${input}' (entrypoint: '${output}').`);
+        }
+
         entryPoints.set(input, output);
+      }
+
+      for (const outputFilename in result.metafile.outputs) {
+        const outputInfo = result.metafile.outputs[outputFilename]!;
+
+        if (outputInfo.entryPoint) {
+          addEntrypoint(outputInfo.entryPoint, outputFilename);
+        } else {
+          const extension = outputFilename.split('.').pop()
+          if (extension !== "css") {
+            continue; // We will *only* modify css outputs
+          }
+
+          const isUnique = (input:string, index: number, self: Array<string>) => index === self.indexOf(input);
+          let mapEntrypointWithExtension = (entrypoint:string) => entrypoint.split('.').slice(0, -1).join('.') + "." + extension;
+          Object.keys(outputInfo.inputs)
+            .map(inputFilename => findEntryPoints(result.metafile!, inputFilename))
+            .reduce((previousValue, currentValue) => [...previousValue, ...currentValue], [])
+            .filter(isUnique)
+            .map(mapEntrypointWithExtension)
+            .forEach(entrypoint => addEntrypoint(entrypoint, outputFilename))
+        }
       }
 
       if (build.initialOptions.outdir === undefined && build.initialOptions.outfile === undefined) {
@@ -89,6 +115,21 @@ const extensionless = (value: string): string => {
 
   return `${dir}${parsed.name}`;
 };
+
+const findEntryPoints = (metafile: Metafile, inputName: string): Array<string> => {
+  const entrypoints = new Array<string>()
+  for (let [outputFilename, outputObject] of Object.entries(metafile.outputs)) {
+    if (Object.keys(outputObject.inputs).includes(inputName)) {
+      if (outputObject.entryPoint) {
+        entrypoints.push(outputObject.entryPoint)
+      } else {
+        entrypoints.concat(findEntryPoints(metafile, outputFilename))
+      }
+    }
+  }
+
+  return entrypoints
+}
 
 const fromEntries = (map: Map<string, string>): {[key: string]: string} => {
   return Array.from(map).reduce((obj: {[key: string]: string}, [key, value]) => {

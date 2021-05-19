@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - Allow the `shortNames` option to specify the input/output or both.
+### Added
+- CSS 'sibling' files that are imported from js will be included in the manifest.
 
 ## [v0.2.1] - 2021-05-10
 ### Fixed
