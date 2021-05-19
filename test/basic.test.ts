@@ -9,6 +9,7 @@ function buildOptions(pluginOptions = {}, overrideBuildOptions = {}) {
     entryPoints: ['test/input/example.js'],
     outdir: 'test/output',
     plugins: [manifestPlugin(pluginOptions)],
+    bundle: true,
   }
 
   return {...defaultBuildOptions, ...overrideBuildOptions};
@@ -122,6 +123,19 @@ test('it should throw an error when there are conflicting short names', async ()
   }
 
   expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(false);
+});
+
+test('it should allow multiple entrypoints with same css', async () => {
+  await require('esbuild').build(buildOptions({hash: false},{
+    entryPoints: ['test/input/example-with-css/example.js', 'test/input/example-with-css/example2.js']
+  }));
+
+  expect(metafileContents()).toMatchObject({
+    "test/input/example-with-css/example.js": "test/output/example.js",
+    "test/input/example-with-css/example.css": "test/output/example2.css",
+    "test/input/example-with-css/example2.js": "test/output/example2.js",
+    "test/input/example-with-css/example2.css": "test/output/example2.css",
+  });
 });
 
 test('it should allow an extensionless input', async () => {
