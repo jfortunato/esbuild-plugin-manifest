@@ -15,7 +15,7 @@ interface ManifestPluginOptions {
   extensionless?: OptionValue;
 }
 
-let Plugin = (options: ManifestPluginOptions = {}): Plugin => ({
+export = (options: ManifestPluginOptions = {}): Plugin => ({
   name: 'manifest',
   setup(build: PluginBuild) {
     build.initialOptions.metafile = true;
@@ -73,7 +73,7 @@ let Plugin = (options: ManifestPluginOptions = {}): Plugin => ({
           const isUnique = (input:string, index: number, self: Array<string>) => index === self.indexOf(input);
           let mapEntrypointWithExtension = (entrypoint:string) => entrypoint.split('.').slice(0, -1).join('.') + "." + extension;
           Object.keys(outputInfo.inputs)
-            .map(inputFilename => findEntryPoints(result.metafile, inputFilename))
+            .map(inputFilename => findEntryPoints(result.metafile!, inputFilename))
             .reduce((previousValue, currentValue) => [...previousValue, ...currentValue], [])
             .filter(isUnique)
             .map(mapEntrypointWithExtension)
@@ -94,7 +94,6 @@ let Plugin = (options: ManifestPluginOptions = {}): Plugin => ({
     });
   }
 });
-export = Plugin;
 
 const shouldModify = (inputOrOutput: 'input'|'output', optionValue?: OptionValue): boolean => {
   return optionValue === inputOrOutput || optionValue === true;
@@ -108,9 +107,8 @@ const extensionless = (value: string): string => {
   return `${dir}${parsed.name}`;
 };
 
-const findEntryPoints = (metafile: Metafile|undefined, inputName: string): Array<string> => {
+const findEntryPoints = (metafile: Metafile, inputName: string): Array<string> => {
   const entrypoints = new Array<string>()
-  // @ts-ignore
   for (let [outputFilename, outputObject] of Object.entries(metafile.outputs)) {
     if (Object.keys(outputObject.inputs).includes(inputName)) {
       if (outputObject.entryPoint) {

@@ -1,4 +1,4 @@
-import manifestPlugin from '../src/index';
+import manifestPlugin from '../lib/index';
 import fs from 'fs';
 import rimraf from 'rimraf';
 
@@ -141,7 +141,7 @@ test('it should allow multiple entrypoints with same css', async () => {
 test('it should allow an extensionless input', async () => {
   await require('esbuild').build(buildOptions({hash: false, extensionless: 'input'}));
 
-  expect(metafileContents()).toMatchObject({'test/input/example': 'test/output/example.js',});
+  expect(metafileContents()).toMatchObject({'test/input/example': 'test/output/example.js'});
 });
 
 test('it should allow an extensionless output', async () => {
