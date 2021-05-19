@@ -66,12 +66,8 @@ let Plugin = (options: ManifestPluginOptions = {}): Plugin => ({
           addEntrypoint(outputInfo.entryPoint, outputFilename);
         } else {
           const extension = outputFilename.split('.').pop()
-          if (!extension) {
-            continue; // we cant map extensionless output
-          }
-
-          if (!["js", "css"].includes(extension)) {
-            continue; // Only generate manifest for js- and css-files
+          if (extension !== "css") {
+            continue; // We will *only* modify css outputs
           }
 
           const isUnique = (input:string, index: number, self: Array<string>) => index === self.indexOf(input);
