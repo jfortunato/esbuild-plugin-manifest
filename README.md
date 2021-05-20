@@ -46,7 +46,7 @@ By default we assume that you want to hash the output files. We use `[dir]/[name
 
 ### `options.shortNames`
 
-Type: `Boolean`
+Type: `Boolean` | 'input' | 'output'
 
 Default: false
 

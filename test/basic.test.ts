@@ -69,25 +69,25 @@ test('it should not override the hashing format if one was supplied already', as
 test('it should generate long names by default', async () => {
   await require('esbuild').build(buildOptions({hash: false}));
 
-  expect(metafileContents()).toMatchObject({'test/input/example.js': 'test/output/example.js'});
+  expect(metafileContents()).toEqual({'test/input/example.js': 'test/output/example.js'});
 });
 
 test('it should generate short names if specified', async () => {
   await require('esbuild').build(buildOptions({hash: false, shortNames: true}));
 
-  expect(metafileContents()).toMatchObject({'example.js': 'example.js'});
+  expect(metafileContents()).toEqual({'example.js': 'example.js'});
 });
 
 test('it should allow a short name for the input only', async () => {
   await require('esbuild').build(buildOptions({hash: false, shortNames: 'input'}));
 
-  expect(metafileContents()).toMatchObject({'example.js': 'test/output/example.js'});
+  expect(metafileContents()).toEqual({'example.js': 'test/output/example.js'});
 });
 
 test('it should allow a short name for the output only', async () => {
   await require('esbuild').build(buildOptions({hash: false, shortNames: 'output'}));
 
-  expect(metafileContents()).toMatchObject({'test/input/example.js': 'example.js'});
+  expect(metafileContents()).toEqual({'test/input/example.js': 'example.js'});
 });
 
 test('it should throw an error when there are conflicting short names', async () => {
@@ -105,7 +105,7 @@ test('it should throw an error when there are conflicting short names', async ()
 test('it should not throw an error if the short name has a different extension', async () => {
   await require('esbuild').build(buildOptions({hash: false, shortNames: true}, {entryPoints: ['test/input/pages/home/index.js', 'test/input/pages/about/index.ts']}));
 
-  expect(metafileContents()).toMatchObject({'index.js': 'index.js', 'index.ts': 'index.js'});
+  expect(metafileContents()).toEqual({'index.js': 'index.js', 'index.ts': 'index.js'});
 });
 
 test('it should throw an error if there are conflicting outputs when the shortNames option is used', async () => {
@@ -173,40 +173,62 @@ test('it should allow multiple entrypoints with same css', async () => {
     entryPoints: ['test/input/example-with-css/example.js', 'test/input/example-with-css/example2.js']
   }));
 
-  expect(metafileContents()).toMatchObject({
+  expect(metafileContents()).toEqual({
     "test/input/example-with-css/example.js": "test/output/example.js",
     "test/input/example-with-css/example.css": "test/output/example2.css",
-    "test/input/example-with-css/example2.js": "test/output/example2.js",
     "test/input/example-with-css/example2.css": "test/output/example2.css",
+    "test/input/example-with-css/example2.js": "test/output/example2.js",
   });
+});
+
+test('it should include an imported css file that is not an explicit entrypoint', async () => {
+  await require('esbuild').build(buildOptions({hash: false}, {entryPoints: ['test/input/example-with-css/example.js']}));
+
+  expect(metafileContents()).toEqual({'test/input/example-with-css/example.js': 'test/output/example.js', 'test/input/example-with-css/example.css': 'test/output/example.css'});
+});
+
+test('it should not include an imported image file that is not an explicit entrypoint', async () => {
+  await require('esbuild').build(buildOptions({hash: false}, {entryPoints: ['test/input/example-with-image/example.js'], loader: {'.png': 'file'}}));
+
+  expect(metafileContents()).toEqual({'test/input/example-with-image/example.js': 'test/output/example.js'});
+});
+
+test('it should throw an error if the extensionless option is used with bundled css', async () => {
+  expect.assertions(1);
+
+  try {
+    await require('esbuild').build(buildOptions({hash: false, extensionless: 'input'}, {entryPoints: ['test/input/example-with-css/example.js']}));
+  } catch (e) {
+    expect(e.message).toMatch(/extensionless option cannot be used/);
+  }
 });
 
 test('it should allow an extensionless input', async () => {
   await require('esbuild').build(buildOptions({hash: false, extensionless: 'input'}));
 
-  expect(metafileContents()).toMatchObject({'test/input/example': 'test/output/example.js'});
+  expect(metafileContents()).toEqual({'test/input/example': 'test/output/example.js'});
 });
 
 test('it should allow an extensionless output', async () => {
   await require('esbuild').build(buildOptions({hash: false, extensionless: 'output'}));
 
-  expect(metafileContents()).toMatchObject({'test/input/example.js': 'test/output/example'});
+  expect(metafileContents()).toEqual({'test/input/example.js': 'test/output/example'});
 });
 
 test('it should allow an extensionless input and output by specifying true', async () => {
   await require('esbuild').build(buildOptions({hash: false, extensionless: true}));
 
-  expect(metafileContents()).toMatchObject({'test/input/example': 'test/output/example'});
+  expect(metafileContents()).toEqual({'test/input/example': 'test/output/example'});
 });
 
 test('it should allow an extensionless input with shortnames', async () => {
   await require('esbuild').build(buildOptions({hash: false, shortNames: true, extensionless: 'input'}));
 
-  expect(metafileContents()).toMatchObject({'example': 'example.js'});
+  expect(metafileContents()).toEqual({'example': 'example.js'});
 });
 
 test('it should allow an extensionless output with shortnames', async () => {
   await require('esbuild').build(buildOptions({hash: false, shortNames: true, extensionless: 'output'}));
 
-  expect(metafileContents()).toMatchObject({'example.js': 'example'});
+  expect(metafileContents()).toEqual({'example.js': 'example'});
 });

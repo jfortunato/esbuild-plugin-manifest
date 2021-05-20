@@ -1,5 +1,5 @@
 import {
-  Metafile,
+  BuildResult, Metafile,
   Plugin,
   PluginBuild
 } from 'esbuild';
@@ -26,7 +26,7 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
       build.initialOptions.entryNames = '[dir]/[name]-[hash]';
     }
 
-    build.onEnd(result => {
+    build.onEnd((result: BuildResult) => {
       // we'll map the input entry point filename to the output filename
       const entryPoints = new Map<string, string>();
 
@@ -46,13 +46,8 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         // When shortNames are enabled, there can be conflicting filenames.
         // For example if the entry points are ['src/pages/home/index.js', 'src/pages/about/index.js'] both of the
         // short names will be 'index.js'. We'll just throw an error if a conflict is detected.
-        //TODO: This should also fail when it's running extensionless and bundles CSS
         if (options.shortNames === true && entryPoints.has(input)) {
           throw new Error(`There is a conflicting shortName for '${input}'.`);
-        }
-
-        if (entryPoints.has(input)) {
-        //  throw new Error(`There is a conflicting input for '${input}' (entrypoint: '${output}').`);
         }
 
         entryPoints.set(input, output);
@@ -67,6 +62,12 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
           const extension = outputFilename.split('.').pop()
           if (extension !== "css") {
             continue; // We will *only* modify css outputs
+          }
+
+          // when css is bundled with a js entrypoint, it will be given the same base name
+          // as that entrypoint and so will always cause a conflict when used with the extensionless option
+          if (options.extensionless === true || options.extensionless === 'input') {
+            throw new Error(`The extensionless option cannot be used when css is imported.`);
           }
 
           const isUnique = (input:string, index: number, self: Array<string>) => index === self.indexOf(input);
