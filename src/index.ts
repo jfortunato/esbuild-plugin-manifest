@@ -56,28 +56,27 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
       for (const outputFilename in result.metafile.outputs) {
         const outputInfo = result.metafile.outputs[outputFilename]!;
 
-        if (outputInfo.entryPoint) {
-          addEntrypoint(outputInfo.entryPoint, outputFilename);
-        } else {
-          const extension = outputFilename.split('.').pop()
-          if (extension !== "css") {
-            continue; // We will *only* modify css outputs
-          }
+        // skip all outputs that don't have an entrypoint
+        if (!outputInfo.entryPoint) {
+          continue;
+        }
 
-          // when css is bundled with a js entrypoint, it will be given the same base name
-          // as that entrypoint and so will always cause a conflict when used with the extensionless option
+        addEntrypoint(outputInfo.entryPoint, outputFilename);
+
+        // Check if this entrypoint has a "sibling" css file
+        // When esbuild encounters js files that import css files, it will gather all the css files referenced from the
+        // entrypoint and bundle it into a single sibling css file that follows the same naming structure as the entrypoint.
+        // So what we can do is simply check the outputs for a sibling file that matches the naming structure.
+        const siblingCssFile = findSiblingCssFile(result.metafile, outputFilename);
+
+        if (siblingCssFile !== undefined) {
+          // a sibling css file will always be given the same base name as its .js entrypoint,
+          // so it will always cause a conflict when used with the extensionless option
           if (options.extensionless === true || options.extensionless === 'input') {
             throw new Error(`The extensionless option cannot be used when css is imported.`);
           }
 
-          const isUnique = (input:string, index: number, self: Array<string>) => index === self.indexOf(input);
-          let mapEntrypointWithExtension = (entrypoint:string) => entrypoint.split('.').slice(0, -1).join('.') + "." + extension;
-          Object.keys(outputInfo.inputs)
-            .map(inputFilename => findEntryPoints(result.metafile!, inputFilename))
-            .reduce((previousValue, currentValue) => [...previousValue, ...currentValue], [])
-            .filter(isUnique)
-            .map(mapEntrypointWithExtension)
-            .forEach(entrypoint => addEntrypoint(entrypoint, outputFilename))
+          addEntrypoint(siblingCssFile.input, siblingCssFile.output);
         }
       }
 
@@ -111,20 +110,34 @@ const extensionless = (value: string): string => {
   return `${dir}${parsed.name}`;
 };
 
-const findEntryPoints = (metafile: Metafile, inputName: string): Array<string> => {
-  const entrypoints = new Array<string>()
-  for (let [outputFilename, outputObject] of Object.entries(metafile.outputs)) {
-    if (Object.keys(outputObject.inputs).includes(inputName)) {
-      if (outputObject.entryPoint) {
-        entrypoints.push(outputObject.entryPoint)
-      } else {
-        entrypoints.concat(findEntryPoints(metafile, outputFilename))
-      }
-    }
-  }
+const findSiblingCssFile = (metafile: Metafile, outputFilename: string): {input: string, output: string}|undefined => {
+  // we need to determine the difference in filenames between the input and output of the entrypoint, so that we can
+  // use that same logic to match against a potential sibling file
+  const entry = metafile.outputs[outputFilename]!.entryPoint!;
 
-  return entrypoints
-}
+  // "example.js" => "example"
+  const entryWithoutExtension = path.basename(entry).replace(/\.js$/, '');
+
+  // "example-GQI5TWWV.js" => "example-GQI5TWWV"
+  const outputWithoutExtension = path.basename(outputFilename).replace(/\.js$/, '');
+
+  // "example-GQI5TWWV" => "-GQI5TWWV"
+  const diff = outputWithoutExtension.replace(entryWithoutExtension, '');
+
+  // esbuild uses [A-Z0-9]{8} as the hash, and that is not currently configurable so we should be able
+  // to match that exactly in the diff and replace it with the regex so we're left with:
+  // "-GQI5TWWV" => "-[A-Z0-9]{8}"
+  const hashRegex = new RegExp(diff.replace(/[A-Z0-9]{8}/, '[A-Z0-9]{8}'));
+
+  // the sibling entry is expected to be the same name as the entrypoint just with a css extension
+  const potentialSiblingEntry = entry.replace(/\.js$/, '.css');
+
+  const potentialSiblingOutput = outputFilename.replace(hashRegex, '').replace(/\.js$/, '.css');
+
+  const found = Object.keys(metafile.outputs).find(output => output.replace(hashRegex, '') === potentialSiblingOutput);
+
+  return found ? { input: potentialSiblingEntry, output: found } : undefined;
+};
 
 const fromEntries = (map: Map<string, string>): {[key: string]: string} => {
   return Array.from(map).reduce((obj: {[key: string]: string}, [key, value]) => {

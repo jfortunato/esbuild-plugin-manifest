@@ -175,7 +175,7 @@ test('it should allow multiple entrypoints with same css', async () => {
 
   expect(metafileContents()).toEqual({
     "test/input/example-with-css/example.js": "test/output/example.js",
-    "test/input/example-with-css/example.css": "test/output/example2.css",
+    "test/input/example-with-css/example.css": "test/output/example.css",
     "test/input/example-with-css/example2.css": "test/output/example2.css",
     "test/input/example-with-css/example2.js": "test/output/example2.js",
   });
@@ -185,6 +185,40 @@ test('it should include an imported css file that is not an explicit entrypoint'
   await require('esbuild').build(buildOptions({hash: false}, {entryPoints: ['test/input/example-with-css/example.js']}));
 
   expect(metafileContents()).toEqual({'test/input/example-with-css/example.js': 'test/output/example.js', 'test/input/example-with-css/example.css': 'test/output/example.css'});
+});
+
+test('it should map a sibling css file when no hash is used', async () => {
+  await require('esbuild').build(buildOptions({hash: false}, {entryPoints: ['test/input/example-with-css/example.js']}));
+
+  expect(metafileContents()).toEqual({'test/input/example-with-css/example.js': 'test/output/example.js', 'test/input/example-with-css/example.css': 'test/output/example.css'});
+})
+
+test('it should map a sibling css file when the standard hash is used', async () => {
+  await require('esbuild').build(buildOptions({}, {entryPoints: ['test/input/example-with-css/example.js']}));
+
+  const contents = metafileContents();
+
+  expect(contents['test/input/example-with-css/example.js']).toMatch(/test\/output\/example-[^\.]+\.js/);
+  expect(contents['test/input/example-with-css/example.css']).toMatch(/test\/output\/example-[^\.]+\.css/);
+})
+
+test('it should map a sibling css file when a different hash is used', async () => {
+  await require('esbuild').build(buildOptions({}, {entryPoints: ['test/input/example-with-css/example.js'], entryNames: '[dir]/[name].[hash]'}));
+
+  const contents = metafileContents();
+
+  expect(contents['test/input/example-with-css/example.js']).toMatch(/test\/output\/example\.[^\.]+\.js/);
+  expect(contents['test/input/example-with-css/example.css']).toMatch(/test\/output\/example\.[^\.]+\.css/);
+})
+
+test('it should map a sibling css file when the hash runs up directly against the filename', async () => {
+  // notice there is no separation between name and hash
+  await require('esbuild').build(buildOptions({}, {entryPoints: ['test/input/example-with-css/example.js'], entryNames: '[dir]/[name][hash]'}));
+
+  const contents = metafileContents();
+
+  expect(contents['test/input/example-with-css/example.js']).toMatch(/test\/output\/example[^\.]+\.js/);
+  expect(contents['test/input/example-with-css/example.css']).toMatch(/test\/output\/example[^\.]+\.css/);
 });
 
 test('it should not include an imported image file that is not an explicit entrypoint', async () => {
