@@ -259,6 +259,14 @@ test('it should throw an error when a css sibling conflicts with a css entrypoin
   }
 });
 
+test('it should not attempt to find a sibling for a css entrypoint ', async () => {
+  await require('esbuild').build(buildOptions({}, {entryPoints: ['test/input/example-with-css/global.css']}));
+
+  const contents = metafileContents();
+
+  expect(contents['test/input/example-with-css/global.css']).toMatch(/test\/output\/global-[^\.]+\.css/);
+});
+
 test('it should not include an imported image file that is not an explicit entrypoint', async () => {
   await require('esbuild').build(buildOptions({hash: false}, {entryPoints: ['test/input/example-with-image/example.js'], loader: {'.png': 'file'}}));
 

@@ -114,6 +114,10 @@ const extensionless = (value: string): string => {
 };
 
 const findSiblingCssFile = (metafile: Metafile, outputFilename: string): {input: string, output: string}|undefined => {
+  if (!outputFilename.endsWith('.js')) {
+    return;
+  }
+
   // we need to determine the difference in filenames between the input and output of the entrypoint, so that we can
   // use that same logic to match against a potential sibling file
   const entry = metafile.outputs[outputFilename]!.entryPoint!;
