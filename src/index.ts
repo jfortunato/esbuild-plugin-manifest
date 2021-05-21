@@ -28,15 +28,15 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
 
     build.onEnd((result: BuildResult) => {
       // we'll map the input entry point filename to the output filename
-      const entryPoints = new Map<string, string>();
+      const mappings = new Map<string, string>();
 
       if (!result.metafile) {
         throw new Error("Expected metafile, but it does not exist.");
       }
 
-      const addEntrypoint = (entryPoint: string, outputFilename: string) => {
+      const addMapping = (inputFilename: string, outputFilename: string) => {
         // check if the shortNames option is being used on the input or output
-        let input = shouldModify('input', options.shortNames) ? shortName(entryPoint) : entryPoint;
+        let input = shouldModify('input', options.shortNames) ? shortName(inputFilename) : inputFilename;
         let output = shouldModify('output', options.shortNames) ? shortName(outputFilename) : outputFilename;
 
         // check if the extensionless option is being used on the input or output
@@ -46,11 +46,14 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         // When shortNames are enabled, there can be conflicting filenames.
         // For example if the entry points are ['src/pages/home/index.js', 'src/pages/about/index.js'] both of the
         // short names will be 'index.js'. We'll just throw an error if a conflict is detected.
-        if (options.shortNames === true && entryPoints.has(input)) {
-          throw new Error(`There is a conflicting shortName for '${input}'.`);
+        //
+        // There are also other scenarios that can cause a conflicting filename so we'll just ensure that the key
+        // we're trying to add doesn't already exist.
+        if (mappings.has(input)) {
+          throw new Error(`There is a conflicting manifest key for '${input}'.`);
         }
 
-        entryPoints.set(input, output);
+        mappings.set(input, output);
       }
 
       for (const outputFilename in result.metafile.outputs) {
@@ -61,7 +64,7 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
           continue;
         }
 
-        addEntrypoint(outputInfo.entryPoint, outputFilename);
+        addMapping(outputInfo.entryPoint, outputFilename);
 
         // Check if this entrypoint has a "sibling" css file
         // When esbuild encounters js files that import css files, it will gather all the css files referenced from the
@@ -76,7 +79,7 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
             throw new Error(`The extensionless option cannot be used when css is imported.`);
           }
 
-          addEntrypoint(siblingCssFile.input, siblingCssFile.output);
+          addMapping(siblingCssFile.input, siblingCssFile.output);
         }
       }
 
@@ -89,7 +92,7 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
       const filename = options.filename || 'manifest.json';
 
       return fs.promises.writeFile(`${outdir}/${filename}`,
-        JSON.stringify(fromEntries(entryPoints), null, 2))
+        JSON.stringify(fromEntries(mappings), null, 2))
     });
   }
 });
