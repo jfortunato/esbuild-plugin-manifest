@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.4.2]
+### Fixed
+- Fix error when typescript entrypoints import css.
+
 ## [v0.4.1]
 ### Fixed
 - Only JS entrypoints will check for a sibling CSS file.

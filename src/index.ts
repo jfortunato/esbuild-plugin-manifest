@@ -50,7 +50,7 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         // There are also other scenarios that can cause a conflicting filename so we'll just ensure that the key
         // we're trying to add doesn't already exist.
         if (mappings.has(input)) {
-          throw new Error(`There is a conflicting manifest key for '${input}'.`);
+          throw new Error("There is a conflicting manifest key for '"+input+"'.");
         }
 
         mappings.set(input, output);
@@ -123,7 +123,7 @@ const findSiblingCssFile = (metafile: Metafile, outputFilename: string): {input:
   const entry = metafile.outputs[outputFilename]!.entryPoint!;
 
   // "example.js" => "example"
-  const entryWithoutExtension = path.basename(entry).replace(/\.js$/, '');
+  const entryWithoutExtension = path.parse(entry).name;
 
   // "example-GQI5TWWV.js" => "example-GQI5TWWV"
   const outputWithoutExtension = path.basename(outputFilename).replace(/\.js$/, '');
@@ -137,7 +137,7 @@ const findSiblingCssFile = (metafile: Metafile, outputFilename: string): {input:
   const hashRegex = new RegExp(diff.replace(/[A-Z0-9]{8}/, '[A-Z0-9]{8}'));
 
   // the sibling entry is expected to be the same name as the entrypoint just with a css extension
-  const potentialSiblingEntry = entry.replace(/\.js$/, '.css');
+  const potentialSiblingEntry = path.parse(entry).dir + '/' + path.parse(entry).name + '.css';
 
   const potentialSiblingOutput = outputFilename.replace(hashRegex, '').replace(/\.js$/, '.css');
 

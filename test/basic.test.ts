@@ -267,6 +267,12 @@ test('it should not attempt to find a sibling for a css entrypoint ', async () =
   expect(contents['test/input/example-with-css/global.css']).toMatch(/test\/output\/global-[^\.]+\.css/);
 });
 
+test('it should map typescript files that import css', async () => {
+  await require('esbuild').build(buildOptions({hash: false}, {entryPoints: ['test/input/example-with-css/example-typescript.ts']}));
+
+  expect(metafileContents()).toEqual({'test/input/example-with-css/example-typescript.ts': 'test/output/example-typescript.js', 'test/input/example-with-css/example-typescript.css': 'test/output/example-typescript.css'});
+});
+
 test('it should not include an imported image file that is not an explicit entrypoint', async () => {
   await require('esbuild').build(buildOptions({hash: false}, {entryPoints: ['test/input/example-with-image/example.js'], loader: {'.png': 'file'}}));
 
