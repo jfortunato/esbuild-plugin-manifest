@@ -38,5 +38,8 @@
     "build:watch": "tsc --watch",
     "test": "jest",
     "prepack": "yarn run build"
-  }
+  },
+  "files": [
+    "lib/**/*"
+  ]
 }
