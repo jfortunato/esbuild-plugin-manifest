@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.4.3]
+### Changed
+- Relax peerDependency on esbuild to everything under v1.0
+
 ## [v0.4.2]
 ### Fixed
 - Fix error when typescript entrypoints import css.
