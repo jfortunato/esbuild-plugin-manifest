@@ -5,6 +5,7 @@ import {
 } from 'esbuild';
 import fs from 'fs';
 import path from 'path';
+import util from 'util';
 
 type OptionValue = boolean | 'input' | 'output';
 
@@ -101,7 +102,7 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
       if (build.initialOptions.write === false) {
         result.outputFiles?.push({
           path: fullPath,
-          contents: new TextEncoder().encode(text),
+          contents: new util.TextEncoder().encode(text),
           get text() {
             return text;
           }

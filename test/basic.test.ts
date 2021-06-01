@@ -1,6 +1,7 @@
 import manifestPlugin from '../lib/index';
 import fs from 'fs';
 import path from 'path';
+import util from 'util';
 import rimraf from 'rimraf';
 
 const OUTPUT_MANIFEST = 'test/output/manifest.json';
@@ -333,7 +334,7 @@ test('it should include the manifest file as part of the build result output fil
 
   const expected = {
     path: path.resolve(OUTPUT_MANIFEST),
-    contents: new TextEncoder().encode(expectedText),
+    contents: new util.TextEncoder().encode(expectedText),
     text: expectedText,
   };
 
