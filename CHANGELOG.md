@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.4.5]
+### Fixed
+- An error would be thrown when using the esbuild `watch=false` option. Now the manifest file is included with esbuild's `outputFiles` and no error is thrown.
+
 ## [v0.4.4]
 ### Fixed
 - Typescript types are now included with the npm package.

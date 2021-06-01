@@ -91,8 +91,26 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
 
       const filename = options.filename || 'manifest.json';
 
-      return fs.promises.writeFile(`${outdir}/${filename}`,
-        JSON.stringify(fromEntries(mappings), null, 2))
+      const fullPath = path.resolve(`${outdir}/${filename}`);
+
+      const text = JSON.stringify(fromEntries(mappings), null, 2);
+
+      // With the esbuild write=false option, nothing will be written to disk. Instead, the build
+      // result will have an "outputFiles" property containing all the files that would have been written.
+      // We want to add the manifest file as one of those "outputFiles".
+      if (build.initialOptions.write === false) {
+        result.outputFiles?.push({
+          path: fullPath,
+          contents: new TextEncoder().encode(text),
+          get text() {
+            return text;
+          }
+        });
+
+        return;
+      }
+
+      return fs.promises.writeFile(fullPath, text);
     });
   }
 });

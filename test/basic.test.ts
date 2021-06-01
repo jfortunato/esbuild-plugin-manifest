@@ -1,5 +1,6 @@
 import manifestPlugin from '../lib/index';
 import fs from 'fs';
+import path from 'path';
 import rimraf from 'rimraf';
 
 const OUTPUT_MANIFEST = 'test/output/manifest.json';
@@ -317,4 +318,24 @@ test('it should allow an extensionless output with shortnames', async () => {
   await require('esbuild').build(buildOptions({hash: false, shortNames: true, extensionless: 'output'}));
 
   expect(metafileContents()).toEqual({'example.js': 'example'});
+});
+
+test('it should not throw an error with esbuild write=false option', async () => {
+  await require('esbuild').build(buildOptions({}, {write: false}));
+
+  expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(false);
+})
+
+test('it should include the manifest file as part of the build result output files with the esbuild write=false option', async () => {
+  const result = await require('esbuild').build(buildOptions({hash: false}, {write: false}));
+
+  const expectedText = `{\n  "test/input/example.js": "test/output/example.js"\n}`;
+
+  const expected = {
+    path: path.resolve(OUTPUT_MANIFEST),
+    contents: new TextEncoder().encode(expectedText),
+    text: expectedText,
+  };
+
+  expect(result.outputFiles).toContainEqual(expected);
 });
