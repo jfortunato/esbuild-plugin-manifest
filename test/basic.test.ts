@@ -1,4 +1,4 @@
-import manifestPlugin from '../lib/index';
+import manifestPlugin from '../src/index';
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
@@ -32,7 +32,7 @@ test('it returns a valid esbuild plugin interface', () => {
 });
 
 test('it works with a require call', () => {
-  const manifestPlugin = require('../lib/index');
+  const manifestPlugin = require('../src/index');
   expect(manifestPlugin()).toHaveProperty('name');
   expect(manifestPlugin()).toHaveProperty('setup');
 });
@@ -340,3 +340,9 @@ test('it should include the manifest file as part of the build result output fil
 
   expect(result.outputFiles).toContainEqual(expected);
 });
+
+test('it should modify result using generate function', async () => {
+  await require('esbuild').build(buildOptions({generate: (entries: {[key: string]: string}) => {return {files: entries}}, hash: false}));
+
+  expect(metafileContents()).toEqual({"files":{"test/input/example.js": "test/output/example.js"}});
+})
