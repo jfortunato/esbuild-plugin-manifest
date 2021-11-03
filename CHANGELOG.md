@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.5.0]
+### Added
+- New option `generate` to allow modifying the manifest result.
+
 ## [v0.4.6]
 ### Fixed
 - Broken tests on Node v10 due to using global `TextEncoder` instead of `util.TextEncoder`
