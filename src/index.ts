@@ -14,6 +14,7 @@ interface ManifestPluginOptions {
   shortNames?: OptionValue;
   filename?: string;
   extensionless?: OptionValue;
+  generate?: (entries: {[key: string]: string}) => Object;
 }
 
 export = (options: ManifestPluginOptions = {}): Plugin => ({
@@ -94,7 +95,11 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
 
       const fullPath = path.resolve(`${outdir}/${filename}`);
 
-      const text = JSON.stringify(fromEntries(mappings), null, 2);
+      const entries = fromEntries(mappings);
+
+      const resultObj = options.generate ? options.generate(entries) : entries;
+
+      const text = JSON.stringify(resultObj, null, 2);
 
       // With the esbuild write=false option, nothing will be written to disk. Instead, the build
       // result will have an "outputFiles" property containing all the files that would have been written.
