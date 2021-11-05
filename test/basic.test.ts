@@ -345,4 +345,16 @@ test('it should modify result using generate function', async () => {
   await require('esbuild').build(buildOptions({generate: (entries: {[key: string]: string}) => {return {files: entries}}, hash: false}));
 
   expect(metafileContents()).toEqual({"files":{"test/input/example.js": "test/output/example.js"}});
-})
+});
+
+test('it should keep the file when filter function returns true', async () => {
+  await require('esbuild').build(buildOptions({filter: (filename: string) => filename.match(/example/), hash: false}));
+
+  expect(metafileContents()).toEqual({"test/input/example.js": "test/output/example.js"});
+});
+
+test('it should remove the file when filter function returns false', async () => {
+  await require('esbuild').build(buildOptions({filter: (filename: string) => filename.match(/notFound/), hash: false}));
+
+  expect(metafileContents()).toEqual({});
+});
