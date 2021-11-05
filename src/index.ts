@@ -9,12 +9,17 @@ import util from 'util';
 
 type OptionValue = boolean | 'input' | 'output';
 
+interface ManifestEntries {
+  [key: string]: string
+}
+
 interface ManifestPluginOptions {
   hash?: boolean;
   shortNames?: OptionValue;
   filename?: string;
   extensionless?: OptionValue;
-  generate?: (entries: {[key: string]: string}) => Object;
+  generate?: (entries: ManifestEntries) => Object;
+  filter?: (filename: string) => boolean;
 }
 
 export = (options: ManifestPluginOptions = {}): Plugin => ({
@@ -97,7 +102,9 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
 
       const entries = fromEntries(mappings);
 
-      const resultObj = options.generate ? options.generate(entries) : entries;
+      const filteredEntries = options.filter ? filterEntries(entries, options.filter) : entries;
+
+      const resultObj = options.generate ? options.generate(filteredEntries) : filteredEntries;
 
       const text = JSON.stringify(resultObj, null, 2);
 
@@ -170,9 +177,18 @@ const findSiblingCssFile = (metafile: Metafile, outputFilename: string): {input:
   return found ? { input: potentialSiblingEntry, output: found } : undefined;
 };
 
-const fromEntries = (map: Map<string, string>): {[key: string]: string} => {
-  return Array.from(map).reduce((obj: {[key: string]: string}, [key, value]) => {
+const fromEntries = (map: Map<string, string>): ManifestEntries => {
+  return Array.from(map).reduce((obj: ManifestEntries, [key, value]) => {
     obj[key] = value;
     return obj;
   }, {});
+};
+
+const filterEntries = (entries: ManifestEntries, filterFunction: any): ManifestEntries => {
+  return Object.keys(entries)
+    .filter(filterFunction)
+    .reduce((obj: ManifestEntries, key) => {
+      obj[key] = entries[key] as string;
+      return obj;
+    }, {});
 };
