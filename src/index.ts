@@ -29,6 +29,11 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
     }
 
     build.onEnd((result: BuildResult) => {
+      // Only proceed if the build result does not have any errors.
+      if (result.errors.length > 0) {
+        return;
+      }
+
       // we'll map the input entry point filename to the output filename
       const mappings = new Map<string, string>();
 

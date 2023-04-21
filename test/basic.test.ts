@@ -346,3 +346,14 @@ test('it should modify result using generate function', async () => {
 
   expect(metafileContents()).toEqual({"files":{"test/input/example.js": "test/output/example.js"}});
 })
+
+test('it should only generate the manifest when the build result contains no errors', async () => {
+  try {
+    await require('esbuild').build(buildOptions({}, {entryPoints: ['test/input/example-with-error.js']}));
+  } catch (e) {
+    // We should expect only 1 BuildFailure error from the source file, we don't want our plugin to throw its own error
+    expect(e.errors.length).toBe(1);
+  }
+
+  expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(false);
+});
