@@ -12,7 +12,7 @@ type OptionValue = boolean | 'input' | 'output';
 interface ManifestPluginOptions {
   hash?: boolean;
   shortNames?: OptionValue;
-  filename?: string;
+  filename?: string | ((options: PluginBuild['initialOptions']) => string);
   extensionless?: OptionValue;
   generate?: (entries: {[key: string]: string}) => Object;
 }
@@ -96,7 +96,9 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
 
       const outdir = build.initialOptions.outdir || path.dirname(build.initialOptions.outfile!);
 
-      const filename = options.filename || 'manifest.json';
+      const filename = typeof options.filename === 'function'
+        ? options.filename(build.initialOptions)
+        : options.filename || 'manifest.json';
 
       const fullPath = path.resolve(`${outdir}/${filename}`);
 
