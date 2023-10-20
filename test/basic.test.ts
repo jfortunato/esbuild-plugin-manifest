@@ -269,6 +269,12 @@ test('it should not attempt to find a sibling for a css entrypoint ', async () =
   expect(contents['test/input/example-with-css/global.css']).toMatch(/test\/output\/global-[^\.]+\.css/);
 });
 
+test('it should map typescript files', async () => {
+  await require('esbuild').build(buildOptions({hash: false}, {entryPoints: ['test/input/example.ts']}));
+
+  expect(metafileContents()).toEqual({'test/input/example.ts': 'test/output/example.js'});
+});
+
 test('it should map typescript files that import css', async () => {
   await require('esbuild').build(buildOptions({hash: false}, {entryPoints: ['test/input/example-with-css/example-typescript.ts']}));
 
@@ -376,4 +382,35 @@ test('it should obtain a lock when writing the manifest file so its not corrupte
     // The issue only happens about 1/3 of the time (before implementing a fix)
     expect(() => JSON.parse(fs.readFileSync(OUTPUT_MANIFEST, 'utf-8'))).not.toThrow();
   }
+});
+
+test('it should use the same extension as the outfile with useOutExtension option', async () => {
+  await require('esbuild').build(buildOptions({hash: false, useOutExtension: true}, {outExtension: {'.js': '.mjs'}}));
+
+  expect(metafileContents()).toEqual({'test/input/example.mjs': 'test/output/example.mjs'});
+});
+
+test('it should use the same extension as the outfile with useOutExtension option when using outfile instead of outdir', async () => {
+  await require('esbuild').build(buildOptions({hash: false, useOutExtension: true}, {outdir: undefined, outfile: 'test/output/out.mjs'}));
+
+  expect(metafileContents()).toEqual({'test/input/example.mjs': 'test/output/out.mjs'});
+});
+
+test('it should throw an error when using the useOutExtension option with an incompatible extensionless option', async () => {
+  const extensionlessOptions = ['input', 'output', true];
+
+  for (const extensionlessOption of extensionlessOptions) {
+    try {
+      await require('esbuild').build(buildOptions({hash: false, useOutExtension: true, extensionless: extensionlessOption}, {outExtension: {'.js': '.mjs'}}));
+    } catch (e) {
+      // Just check that the error message mentions both options
+      expect(e.message).toMatch(/useOutExtension.+extensionless/);
+    }
+  }
+});
+
+test('it should not throw an error when using the useOutExtension option with a compatible extensionless option', async () => {
+  await require('esbuild').build(buildOptions({hash: false, useOutExtension: true, extensionless: false}, {outExtension: {'.js': '.mjs'}}));
+
+  expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(true);
 });
