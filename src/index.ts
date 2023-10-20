@@ -6,6 +6,7 @@ import {
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
+import lockfile from 'proper-lockfile';
 
 type OptionValue = boolean | 'input' | 'output';
 
@@ -121,10 +122,49 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         return;
       }
 
-      return fs.promises.writeFile(fullPath, text);
+      return writeFileWithLock(fullPath, text);
     });
   }
 });
+
+const writeFileWithLock = async (fullPath: string, text: string): Promise<void> => {
+  // Retry up to 5 times, using exponential backoff but capped at 100ms between retries
+  // See: https://github.com/tim-kos/node-retry#retrytimeoutsoptions for an explanation of the options
+  const retryOptions = {
+    retries: {
+      retries: 5,
+      minTimeout: 10,
+      maxTimeout: 100,
+    }
+  };
+
+  try {
+    // Ensure the file exists before we try to lock it
+    await ensureFile(fullPath);
+    // Lock the file, write the contents, then release the lock
+    const release = await lockfile.lock(fullPath, retryOptions);
+    await fs.promises.writeFile(fullPath, text);
+    await release();
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+// Creates the file if it does not exist, otherwise does nothing. We need to do this because
+// the lockfile library will throw an error if the file does not exist already.
+const ensureFile = async (fullPath: string): Promise<void> => {
+  try {
+    await fs.promises.access(fullPath)
+  } catch (err) {
+    // If the error is not that the file does not exist, rethrow it
+    if (err.code !== 'ENOENT') {
+      throw err;
+    }
+
+    // We got an ENOENT error, so create the file
+    await fs.promises.writeFile(fullPath, '');
+  }
+};
 
 const shouldModify = (inputOrOutput: 'input'|'output', optionValue?: OptionValue): boolean => {
   return optionValue === inputOrOutput || optionValue === true;

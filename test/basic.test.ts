@@ -357,3 +357,23 @@ test('it should only generate the manifest when the build result contains no err
 
   expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(false);
 });
+
+test('it should obtain a lock when writing the manifest file so its not corrupted when running in parallel', async () => {
+  // Increase the chances of hitting the fail condition (pre-fix) by running the test multiple times
+  const TIMES_TO_RUN = 10;
+
+  for (let i = 0; i < TIMES_TO_RUN; i++) {
+    const esbuild = require('esbuild');
+
+    await Promise.all([
+      esbuild.build(buildOptions({}, {format: 'iife'})),
+      esbuild.build(buildOptions({}, {format: 'esm', outExtension: {'.js': '.mjs'}})),
+    ]);
+
+    expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(true);
+    // When a race condition occurs, the manifest file will not be valid JSON. Usually what happens is
+    // it will end with double braces, like this: "}}"
+    // The issue only happens about 1/3 of the time (before implementing a fix)
+    expect(() => JSON.parse(fs.readFileSync(OUTPUT_MANIFEST, 'utf-8'))).not.toThrow();
+  }
+});
