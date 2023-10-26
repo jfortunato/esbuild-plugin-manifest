@@ -1,11 +1,3 @@
-## [Unreleased]
-### Fixed
-- Use a lock when writing the manifest file to prevent corruption when multiple builds are running at the same time.
-
-### Added
-- Allow manifest key to keep the same extension as it's output file.
-- New `append` option to append to an existing manifest file instead of overwriting it.
-
 ## [0.7.0](https://github.com/jfortunato/esbuild-plugin-manifest/compare/v0.6.0...v0.7.0) (2023-10-26)
 
 
