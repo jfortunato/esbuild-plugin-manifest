@@ -6,6 +6,19 @@
 - Allow manifest key to keep the same extension as it's output file.
 - New `append` option to append to an existing manifest file instead of overwriting it.
 
+## [0.7.0](https://github.com/jfortunato/esbuild-plugin-manifest/compare/v0.6.0...v0.7.0) (2023-10-26)
+
+
+### Features
+
+* Add "append" option to not overwrite existing manifest ([90be58a](https://github.com/jfortunato/esbuild-plugin-manifest/commit/90be58a0880864f5afa6628682f28b413c19944a))
+* Enable manifest keys to use the same extension as it's outfile ([e0d54d4](https://github.com/jfortunato/esbuild-plugin-manifest/commit/e0d54d4151e2829eb18b4506e876d24fb2075704))
+
+
+### Bug Fixes
+
+* Prevent multiple parallel builds from corrupting manifest file ([e0a713f](https://github.com/jfortunato/esbuild-plugin-manifest/commit/e0a713fdfa0f9d17259501427cb9765e7c2ad4a1))
+
 ## [v0.6.0]
 ### Fixed
 - Don't throw our own errors when the build result contains other errors.
