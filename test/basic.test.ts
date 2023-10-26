@@ -414,3 +414,32 @@ test('it should not throw an error when using the useOutExtension option with a 
 
   expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(true);
 });
+
+test('it should retain a previous key with append=true option', async () => {
+  await require('esbuild').build(buildOptions({hash: false}));
+  await require('esbuild').build(buildOptions({hash: false, append: true}, {entryPoints: ['test/input/example.ts']}));
+
+  expect(metafileContents()).toEqual({'test/input/example.js': 'test/output/example.js', 'test/input/example.ts': 'test/output/example.js'});
+});
+
+test('it should overwrite a previous key with append=true option if its been updated', async () => {
+  // The first build will generate a manifest with a hash
+  await require('esbuild').build(buildOptions({hash: true}));
+  // The second build will generate a manifest without a hash
+  await require('esbuild').build(buildOptions({hash: false, append: true}));
+
+  expect(metafileContents()).toEqual({'test/input/example.js': 'test/output/example.js'});
+});
+
+test('it should not throw an error if there is no preexisting file with append=true option', async () => {
+  await require('esbuild').build(buildOptions({hash: false, append: true}));
+
+  expect(metafileContents()).toEqual({'test/input/example.js': 'test/output/example.js'});
+});
+
+test('it supports multiple output formats', async () => {
+  await require('esbuild').build(buildOptions({hash: false, useOutExtension: true, append: true}, {outExtension: {'.js': '.mjs'}}));
+  await require('esbuild').build(buildOptions({hash: false, useOutExtension: true, append: true}, {outExtension: {'.js': '.cjs'}}));
+
+  expect(metafileContents()).toEqual({'test/input/example.mjs': 'test/output/example.mjs', 'test/input/example.cjs': 'test/output/example.cjs'});
+});

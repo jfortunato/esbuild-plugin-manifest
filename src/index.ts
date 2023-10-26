@@ -16,6 +16,7 @@ interface ManifestPluginOptions {
   filename?: string;
   extensionless?: OptionValue;
   useOutExtension?: boolean;
+  append?: boolean;
   generate?: (entries: {[key: string]: string}) => Object;
 }
 
@@ -114,7 +115,15 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
 
       const fullPath = path.resolve(`${outdir}/${filename}`);
 
-      const entries = fromEntries(mappings);
+      // If the append option is used, we'll read the existing manifest file and merge it with the new entries.
+      let existingManifest: {[key: string]: string} = {};
+      if (options.append) {
+        try {
+          existingManifest = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
+        } catch (e) { }
+      }
+
+      const entries = fromEntries(mappings, existingManifest);
 
       const resultObj = options.generate ? options.generate(entries) : entries;
 
@@ -228,9 +237,11 @@ const findSiblingCssFile = (metafile: Metafile, outputFilename: string): {input:
   return found ? { input: potentialSiblingEntry, output: found } : undefined;
 };
 
-const fromEntries = (map: Map<string, string>): {[key: string]: string} => {
-  return Array.from(map).reduce((obj: {[key: string]: string}, [key, value]) => {
+const fromEntries = (map: Map<string, string>, mergeWith: {[key: string]: string}): {[key: string]: string} => {
+  const obj = Array.from(map).reduce((obj: {[key: string]: string}, [key, value]) => {
     obj[key] = value;
     return obj;
   }, {});
+
+  return {...mergeWith, ...obj};
 };
