@@ -77,3 +77,19 @@ Type: `Function`
 Default: `undefined`
 
 A custom Function to create the manifest. The passed function should match the signature of `(entries: {[key: string]: string}) => Object`; and can return anything as long as it's serialisable by `JSON.stringify`.
+
+### `options.useOutExtension`
+
+Type: `Boolean`
+
+Default: `false`
+
+By default, we use the extension of the input file (entrypoint) for the manifest key. This option will use the extension of the output file instead.
+
+### `options.append`
+
+Type: `Boolean`
+
+Default: `false`
+
+By default, we will overwrite the manifest file if it already exists. This option will append to the existing manifest file instead and only overwrite the entries that have changed.
