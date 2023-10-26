@@ -93,3 +93,83 @@ Type: `Boolean`
 Default: `false`
 
 By default, we will overwrite the manifest file if it already exists. This option will append to the existing manifest file instead and only overwrite the entries that have changed.
+
+## Advanced Usage Examples
+
+### Typescript Entrypoint
+
+```js
+// build.js
+const esbuild = require('esbuild');
+const manifestPlugin = require('esbuild-plugin-manifest')
+
+esbuild.build({
+  entryPoints: ['src/index.ts'],
+  bundle: true,
+  outdir: 'output/',
+  plugins: [manifestPlugin()],
+}).catch((e) => console.error(e.message))
+```
+
+```json
+// manifest.json
+{
+  "src/index.js": "output/index-4QTUNIID.js"
+}
+```
+
+### Entrypoint Keys (.ts file example)
+
+```js
+// build.js
+const esbuild = require('esbuild');
+const manifestPlugin = require('esbuild-plugin-manifest')
+
+esbuild.build({
+  entryPoints: ['src/index.ts'],
+  bundle: true,
+  outdir: 'output/',
+  plugins: [manifestPlugin({useEntryExtension: true})],
+}).catch((e) => console.error(e.message))
+```
+
+```json
+// manifest.json
+{
+  "src/index.ts": "output/index-4QTUNIID.js"
+}
+```
+
+### Multiple Formats
+
+To generate multiple files from the same entrypoint with esbuild, you need to run it multiple times. Utilize esbuilds [`outExtension`](https://esbuild.github.io/api/#out-extension) option along with our [`append`](https://github.com/jfortunato/esbuild-plugin-manifest#optionsappend) option to generate multiple files from the same entrypoint.
+
+```js
+// build.js
+import * as esbuild from 'esbuild'
+import manifestPlugin from 'esbuild-plugin-manifest'
+
+await esbuild.build({
+  entryPoints: ['src/index.js'],
+  bundle: true,
+  outdir: 'output/',
+  plugins: [manifestPlugin()],
+}).catch((e) => console.error(e.message))
+
+await esbuild.build({
+  entryPoints: ['src/index.js'],
+  bundle: true,
+  outdir: 'output/',
+  outExtension: { '.js': '.mjs' },
+  plugins: [manifestPlugin({ append: true })],
+}).catch((e) => console.error(e.message))
+
+```
+
+```json
+// manifest.json
+{
+  "src/index.js": "output/index-4QTUNIID.js",
+  "src/index.mjs": "output/index-5RUVOJJE.mjs"
+}
+```
