@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Use a lock when writing the manifest file to prevent corruption when multiple builds are running at the same time.
+
+### Added
+- Allow manifest key to keep the same extension as it's output file.
+- New `append` option to append to an existing manifest file instead of overwriting it.
 
 ## [v0.6.0]
 ### Fixed
