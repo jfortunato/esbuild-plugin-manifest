@@ -38,6 +38,7 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "prepack": "yarn run build"
   },
   "files": [
