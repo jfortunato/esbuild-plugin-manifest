@@ -1,6 +1,8 @@
 # esbuild-plugin-manifest
 
+![Release Version](https://img.shields.io/github/v/release/jfortunato/esbuild-plugin-manifest)
 ![Node.js CI](https://github.com/jfortunato/esbuild-plugin-manifest/workflows/Node.js%20CI/badge.svg)
+[![codecov](https://codecov.io/gh/jfortunato/esbuild-plugin-manifest/graph/badge.svg?token=TWEQVWQ09G)](https://codecov.io/gh/jfortunato/esbuild-plugin-manifest)
 
 This plugin will generate a manifest.json file, mapping original asset names to their corresponding output name.
 
