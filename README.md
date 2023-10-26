@@ -111,7 +111,7 @@ esbuild.build({
 }).catch((e) => console.error(e.message))
 ```
 
-```json
+```json5
 // manifest.json
 {
   "src/index.js": "output/index-4QTUNIID.js"
@@ -133,7 +133,7 @@ esbuild.build({
 }).catch((e) => console.error(e.message))
 ```
 
-```json
+```json5
 // manifest.json
 {
   "src/index.ts": "output/index-4QTUNIID.js"
@@ -166,7 +166,7 @@ await esbuild.build({
 
 ```
 
-```json
+```json5
 // manifest.json
 {
   "src/index.js": "output/index-4QTUNIID.js",
