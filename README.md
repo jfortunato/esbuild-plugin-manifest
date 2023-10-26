@@ -78,13 +78,13 @@ Default: `undefined`
 
 A custom Function to create the manifest. The passed function should match the signature of `(entries: {[key: string]: string}) => Object`; and can return anything as long as it's serialisable by `JSON.stringify`.
 
-### `options.useOutExtension`
+### `options.useEntryExtension`
 
 Type: `Boolean`
 
 Default: `false`
 
-By default, we use the extension of the input file (entrypoint) for the manifest key. This option will use the extension of the output file instead.
+By default, we use the same extension of the output file as the keys of the manifest key entry. Use this option if you'd rather use the input file (entrypoint) as the manifest key instead.
 
 ### `options.append`
 

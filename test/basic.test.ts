@@ -104,8 +104,14 @@ test('it should throw an error when there are conflicting short names', async ()
   expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(false);
 });
 
-test('it should not throw an error if the short name has a different extension', async () => {
-  await require('esbuild').build(buildOptions({hash: false, shortNames: true}, {entryPoints: ['test/input/pages/home/index.js', 'test/input/pages/about/index.ts']}));
+test('it should not throw an error if the short name has the same extension but a different basename', async () => {
+  await require('esbuild').build(buildOptions({hash: false, shortNames: true}, {entryPoints: ['test/input/pages/home/index.js', 'test/input/example.js']}));
+
+  expect(metafileContents()).toEqual({'index.js': 'index.js', 'example.js': 'example.js'});
+});
+
+test('it should not throw an error if the entrypoints have the same name, different extensions, and the useEntryExtension option is used', async () => {
+  await require('esbuild').build(buildOptions({hash: false, shortNames: true, useEntryExtension: true}, {entryPoints: ['test/input/pages/home/index.js', 'test/input/pages/about/index.ts']}));
 
   expect(metafileContents()).toEqual({'index.js': 'index.js', 'index.ts': 'index.js'});
 });
@@ -272,13 +278,13 @@ test('it should not attempt to find a sibling for a css entrypoint ', async () =
 test('it should map typescript files', async () => {
   await require('esbuild').build(buildOptions({hash: false}, {entryPoints: ['test/input/example.ts']}));
 
-  expect(metafileContents()).toEqual({'test/input/example.ts': 'test/output/example.js'});
+  expect(metafileContents()).toEqual({'test/input/example.js': 'test/output/example.js'});
 });
 
 test('it should map typescript files that import css', async () => {
   await require('esbuild').build(buildOptions({hash: false}, {entryPoints: ['test/input/example-with-css/example-typescript.ts']}));
 
-  expect(metafileContents()).toEqual({'test/input/example-with-css/example-typescript.ts': 'test/output/example-typescript.js', 'test/input/example-with-css/example-typescript.css': 'test/output/example-typescript.css'});
+  expect(metafileContents()).toEqual({'test/input/example-with-css/example-typescript.js': 'test/output/example-typescript.js', 'test/input/example-with-css/example-typescript.css': 'test/output/example-typescript.css'});
 });
 
 test('it should not include an imported image file that is not an explicit entrypoint', async () => {
@@ -384,42 +390,58 @@ test('it should obtain a lock when writing the manifest file so its not corrupte
   }
 });
 
-test('it should use the same extension as the outfile with useOutExtension option', async () => {
-  await require('esbuild').build(buildOptions({hash: false, useOutExtension: true}, {outExtension: {'.js': '.mjs'}}));
+test('it should use the same extension as the output when it is changed via the esbuild outExtension option', async () => {
+  await require('esbuild').build(buildOptions({hash: false}, {outExtension: {'.js': '.mjs'}}));
 
   expect(metafileContents()).toEqual({'test/input/example.mjs': 'test/output/example.mjs'});
 });
 
-test('it should use the same extension as the outfile with useOutExtension option when using outfile instead of outdir', async () => {
-  await require('esbuild').build(buildOptions({hash: false, useOutExtension: true}, {outdir: undefined, outfile: 'test/output/out.mjs'}));
+test('it should use the same extension as the entry with useEntryExtension option', async () => {
+  await require('esbuild').build(buildOptions({hash: false, useEntryExtension: true}, {outExtension: {'.js': '.mjs'}}));
 
-  expect(metafileContents()).toEqual({'test/input/example.mjs': 'test/output/out.mjs'});
+  expect(metafileContents()).toEqual({'test/input/example.js': 'test/output/example.mjs'});
 });
 
-test('it should throw an error when using the useOutExtension option with an incompatible extensionless option', async () => {
-  const extensionlessOptions = ['input', 'output', true];
+test('it should use the same extension as the entry with useEntryExtension option (typescript)', async () => {
+  await require('esbuild').build(buildOptions({hash: false, useEntryExtension: true}, {entryPoints: ['test/input/example.ts']}));
 
-  for (const extensionlessOption of extensionlessOptions) {
-    try {
-      await require('esbuild').build(buildOptions({hash: false, useOutExtension: true, extensionless: extensionlessOption}, {outExtension: {'.js': '.mjs'}}));
-    } catch (e) {
-      // Just check that the error message mentions both options
-      expect(e.message).toMatch(/useOutExtension.+extensionless/);
-    }
+  expect(metafileContents()).toEqual({'test/input/example.ts': 'test/output/example.js'});
+});
+
+test('it should use the same extension as the entry with useEntryExtension option when using outfile instead of outdir', async () => {
+  await require('esbuild').build(buildOptions({hash: false, useEntryExtension: true}, {outdir: undefined, outfile: 'test/output/out.mjs'}));
+
+  expect(metafileContents()).toEqual({'test/input/example.js': 'test/output/out.mjs'});
+});
+
+test.each(['input', true])('it should not throw an error when using the useEntryExtension option with a compatible extensionless option', async (extensionlessOption) => {
+  expect.assertions(1);
+
+  try {
+    await require('esbuild').build(buildOptions({hash: false, useEntryExtension: true, extensionless: extensionlessOption}));
+  } catch (e) {
+    // Just check that the error message mentions both options
+    expect(e.message).toMatch(/useEntryExtension.+extensionless/);
   }
 });
 
-test('it should not throw an error when using the useOutExtension option with a compatible extensionless option', async () => {
-  await require('esbuild').build(buildOptions({hash: false, useOutExtension: true, extensionless: false}, {outExtension: {'.js': '.mjs'}}));
+test.each(['output', false, undefined])('it should not throw an error when using the useEntryExtension option with a compatible extensionless option', async (extensionlessOption) => {
+  await require('esbuild').build(buildOptions({hash: false, useEntryExtension: true, extensionless: extensionlessOption}));
 
   expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(true);
 });
 
+test('it is able to use extensionless=output along with useEntryExtension', async () => {
+  await require('esbuild').build(buildOptions({hash: false, useEntryExtension: true, extensionless: 'output'}, {outExtension: {'.js': '.mjs'}}));
+
+  expect(metafileContents()).toEqual({'test/input/example.js': 'test/output/example'});
+})
+
 test('it should retain a previous key with append=true option', async () => {
   await require('esbuild').build(buildOptions({hash: false}));
-  await require('esbuild').build(buildOptions({hash: false, append: true}, {entryPoints: ['test/input/example.ts']}));
+  await require('esbuild').build(buildOptions({hash: false, append: true}, {entryPoints: ['test/input/pages/home/index.js']}));
 
-  expect(metafileContents()).toEqual({'test/input/example.js': 'test/output/example.js', 'test/input/example.ts': 'test/output/example.js'});
+  expect(metafileContents()).toEqual({'test/input/example.js': 'test/output/example.js', 'test/input/pages/home/index.js': 'test/output/index.js'});
 });
 
 test('it should overwrite a previous key with append=true option if its been updated', async () => {
@@ -437,9 +459,9 @@ test('it should not throw an error if there is no preexisting file with append=t
   expect(metafileContents()).toEqual({'test/input/example.js': 'test/output/example.js'});
 });
 
-test('it supports multiple output formats', async () => {
-  await require('esbuild').build(buildOptions({hash: false, useOutExtension: true, append: true}, {outExtension: {'.js': '.mjs'}}));
-  await require('esbuild').build(buildOptions({hash: false, useOutExtension: true, append: true}, {outExtension: {'.js': '.cjs'}}));
+test('it supports multiple output formats by using append=true and running esbuild multiple times with a different outExtension', async () => {
+  await require('esbuild').build(buildOptions({hash: false, append: true}, {outExtension: {'.js': '.mjs'}}));
+  await require('esbuild').build(buildOptions({hash: false, append: true}, {outExtension: {'.js': '.cjs'}}));
 
   expect(metafileContents()).toEqual({'test/input/example.mjs': 'test/output/example.mjs', 'test/input/example.cjs': 'test/output/example.cjs'});
 });

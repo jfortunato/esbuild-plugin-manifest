@@ -15,7 +15,7 @@ interface ManifestPluginOptions {
   shortNames?: OptionValue;
   filename?: string;
   extensionless?: OptionValue;
-  useOutExtension?: boolean;
+  useEntryExtension?: boolean;
   append?: boolean;
   generate?: (entries: {[key: string]: string}) => Object;
 }
@@ -53,16 +53,16 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         input = shouldModify('input', options.extensionless) ? extensionless(input) : input;
         output = shouldModify('output', options.extensionless) ? extensionless(output) : output;
 
-        // check if the useOutExtension option is being used
-        if (options.useOutExtension) {
-          // Cannot use the useOutExtension option when the extensionless option is also being used
-          if (options.extensionless !== undefined && options.extensionless !== false) {
-            throw new Error("The useOutExtension option cannot be used when the extensionless option is also being used.");
-          }
-
+        // By default, we want to use the same extension for the key as the output file.
+        if (!options.useEntryExtension) {
           const inputExtension = path.parse(inputFilename).ext;
           const outputExtension = path.parse(outputFilename).ext;
           input = input.replace(inputExtension, outputExtension);
+        } else {
+          // Cannot use the useEntryExtension option when the extensionless option is also being used
+          if (options.extensionless === true || options.extensionless === 'input') {
+            throw new Error("The useEntryExtension option cannot be used when the extensionless option is also being used.");
+          }
         }
 
         // When shortNames are enabled, there can be conflicting filenames.
