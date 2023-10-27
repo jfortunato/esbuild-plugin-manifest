@@ -109,11 +109,16 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         throw new Error("You must specify an 'outdir' when generating a manifest file.");
       }
 
-      const outdir = build.initialOptions.outdir || path.dirname(build.initialOptions.outfile!);
+      let outdir = build.initialOptions.outdir || path.dirname(build.initialOptions.outfile!);
+
+      // If the user specified an absolute working directory, we'll need to resolve the outdir relative to that.
+      if (build.initialOptions.absWorkingDir !== undefined) {
+        outdir = path.resolve(build.initialOptions.absWorkingDir, outdir);
+      }
 
       const filename = options.filename || 'manifest.json';
 
-      const fullPath = path.resolve(`${outdir}/${filename}`);
+      const fullPath = path.resolve(outdir, filename);
 
       // If the append option is used, we'll read the existing manifest file and merge it with the new entries.
       let existingManifest: {[key: string]: string} = {};
@@ -228,7 +233,7 @@ const findSiblingCssFile = (metafile: Metafile, outputFilename: string): {input:
   const hashRegex = new RegExp(diff.replace(/[A-Z0-9]{8}/, '[A-Z0-9]{8}'));
 
   // the sibling entry is expected to be the same name as the entrypoint just with a css extension
-  const potentialSiblingEntry = path.parse(entry).dir + '/' + path.parse(entry).name + '.css';
+  const potentialSiblingEntry = path.join(path.parse(entry).dir, path.parse(entry).name + '.css');
 
   const potentialSiblingOutput = outputFilename.replace(hashRegex, '').replace(/\.js$/, '.css');
 

@@ -465,3 +465,16 @@ test('it supports multiple output formats by using append=true and running esbui
 
   expect(metafileContents()).toEqual({'test/input/example.mjs': 'test/output/example.mjs', 'test/input/example.cjs': 'test/output/example.cjs'});
 });
+
+test('it should use the proper keys for the manifest when building from the same directory as the build script', async () => {
+  // We'll simulate running the build script in the same directory as the input files by
+  // using the absWorkingDir option
+  const wd = path.join(__dirname, 'input', 'example-with-css');
+  const outdirRelativeToWd = path.join('..', '..', 'output');
+
+  await require('esbuild').build(buildOptions({}, {entryPoints: ['example.js'], absWorkingDir: wd, outdir: outdirRelativeToWd}));
+
+  // Only worried about testing the keys here
+  const contents = metafileContents();
+  expect(Object.keys(contents)).toEqual(['example.js', 'example.css']);
+});
