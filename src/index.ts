@@ -20,6 +20,11 @@ interface ManifestPluginOptions {
   generate?: (entries: {[key: string]: string}) => Object;
 }
 
+interface EntrypointOutputInfo {
+  outputFilename: string;
+  outputInfo: Metafile['outputs'][keyof Metafile['outputs']];
+}
+
 export = (options: ManifestPluginOptions = {}): Plugin => ({
   name: 'manifest',
   setup(build: PluginBuild) {
@@ -27,9 +32,9 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
 
     // assume that the user wants to hash their files by default,
     // but don't override any hashing format they may have already set.
-    if (options.hash !== false && !build.initialOptions.entryNames) {
-      build.initialOptions.entryNames = '[dir]/[name]-[hash]';
-    }
+    const defaultHashNames = options.hash === false ? '[dir]/[name]' : '[dir]/[name]-[hash]';
+    build.initialOptions.entryNames = build.initialOptions.entryNames || defaultHashNames;
+    build.initialOptions.assetNames = build.initialOptions.assetNames || defaultHashNames;
 
     build.onEnd((result: BuildResult) => {
       // Only proceed if the build result does not have any errors.
@@ -53,18 +58,6 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         input = shouldModify('input', options.extensionless) ? extensionless(input) : input;
         output = shouldModify('output', options.extensionless) ? extensionless(output) : output;
 
-        // By default, we want to use the same extension for the key as the output file.
-        if (!options.useEntryExtension) {
-          const inputExtension = path.parse(inputFilename).ext;
-          const outputExtension = path.parse(outputFilename).ext;
-          input = input.replace(inputExtension, outputExtension);
-        } else {
-          // Cannot use the useEntryExtension option when the extensionless option is also being used
-          if (options.extensionless === true || options.extensionless === 'input') {
-            throw new Error("The useEntryExtension option cannot be used when the extensionless option is also being used.");
-          }
-        }
-
         // When shortNames are enabled, there can be conflicting filenames.
         // For example if the entry points are ['src/pages/home/index.js', 'src/pages/about/index.js'] both of the
         // short names will be 'index.js'. We'll just throw an error if a conflict is detected.
@@ -72,12 +65,15 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         // There are also other scenarios that can cause a conflicting filename so we'll just ensure that the key
         // we're trying to add doesn't already exist.
         if (mappings.has(input)) {
-          throw new Error("There is a conflicting manifest key for '"+input+"'.");
+          throw new Error(`There is a conflicting manifest key for '${input}'. First conflicting output: '${mappings.get(input)}'. Second conflicting output: '${output}'.`);
         }
 
         mappings.set(input, output);
       }
 
+      // Get a map of each entrypoints output directory to its output info. When we loop through all the outputs
+      // this will allow us to determine the entrypoint for each output.
+      const outputDirToEntrypointOutputInfo: Map<string, any> = new Map();
       for (const outputFilename in result.metafile.outputs) {
         const outputInfo = result.metafile.outputs[outputFilename]!;
 
@@ -86,23 +82,39 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
           continue;
         }
 
-        addMapping(outputInfo.entryPoint, outputFilename);
+        const info: EntrypointOutputInfo = {outputFilename: outputFilename, outputInfo: outputInfo};
+        outputDirToEntrypointOutputInfo.set(path.dirname(outputFilename), info);
+      }
 
-        // Check if this entrypoint has a "sibling" css file
-        // When esbuild encounters js files that import css files, it will gather all the css files referenced from the
-        // entrypoint and bundle it into a single sibling css file that follows the same naming structure as the entrypoint.
-        // So what we can do is simply check the outputs for a sibling file that matches the naming structure.
-        const siblingCssFile = findSiblingCssFile(result.metafile, outputFilename);
+      for (const outputFilename in result.metafile.outputs) {
+        // Find the entrypoint for this output, and use its source directory as the base directory for the key.
+        const outputDir = path.dirname(outputFilename);
+        const info = outputDirToEntrypointOutputInfo.get(outputDir);
 
-        if (siblingCssFile !== undefined) {
-          // a sibling css file will always be given the same base name as its .js entrypoint,
-          // so it will always cause a conflict when used with the extensionless option
+        if (info === undefined) {
+          throw new Error("Could not find the entrypoint for the output '"+outputFilename+"'.");
+        }
+
+        // Are we processing the entrypoint file itself or a sibling/imported file?
+        const isEntryFile = info.outputFilename === outputFilename;
+        const entrySrcDir = path.dirname(info.outputInfo.entryPoint);
+
+        const unhashedFilename = unhashed(outputFilename, info.outputInfo.entryPoint, info.outputFilename);
+        const basename = path.basename(unhashedFilename);
+
+        let key = path.join(entrySrcDir, basename);
+
+        // If the user specified the useEntryExtension option, we'll use the entrypoint filename as the key.
+        if (options.useEntryExtension && isEntryFile) {
+          // Cannot use the useEntryExtension option when the extensionless option is also being used
           if (options.extensionless === true || options.extensionless === 'input') {
-            throw new Error(`The extensionless option cannot be used when css is imported.`);
+            throw new Error("The useEntryExtension option cannot be used when the extensionless option is also being used.");
           }
 
-          addMapping(siblingCssFile.input, siblingCssFile.output);
+          key = info.outputInfo.entryPoint;
         }
+
+        addMapping(key, outputFilename);
       }
 
       if (build.initialOptions.outdir === undefined && build.initialOptions.outfile === undefined) {
@@ -149,6 +161,7 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         return;
       }
 
+      writeFileWithLock(path.resolve(path.dirname(fullPath), 'metafile'), JSON.stringify(result.metafile, null, 2));
       return writeFileWithLock(fullPath, text);
     });
   }
@@ -209,20 +222,15 @@ const extensionless = (value: string): string => {
   return `${dir}${parsed.name}`;
 };
 
-const findSiblingCssFile = (metafile: Metafile, outputFilename: string): {input: string, output: string}|undefined => {
-  if (!outputFilename.endsWith('.js')) {
-    return;
-  }
-
+const unhashed = (value: string, entrypointInput: string, entrypointOutput: string): string => {
   // we need to determine the difference in filenames between the input and output of the entrypoint, so that we can
   // use that same logic to match against a potential sibling file
-  const entry = metafile.outputs[outputFilename]!.entryPoint!;
 
   // "example.js" => "example"
-  const entryWithoutExtension = path.parse(entry).name;
+  const entryWithoutExtension = path.parse(entrypointInput).name;
 
   // "example-GQI5TWWV.js" => "example-GQI5TWWV"
-  const outputWithoutExtension = path.basename(outputFilename).replace(/\.js$/, '');
+  const outputWithoutExtension = path.parse(entrypointOutput).name;
 
   // "example-GQI5TWWV" => "-GQI5TWWV"
   const diff = outputWithoutExtension.replace(entryWithoutExtension, '');
@@ -232,15 +240,12 @@ const findSiblingCssFile = (metafile: Metafile, outputFilename: string): {input:
   // "-GQI5TWWV" => "-[A-Z0-9]{8}"
   const hashRegex = new RegExp(diff.replace(/[A-Z0-9]{8}/, '[A-Z0-9]{8}'));
 
-  // the sibling entry is expected to be the same name as the entrypoint just with a css extension
-  const potentialSiblingEntry = path.join(path.parse(entry).dir, path.parse(entry).name + '.css');
+  const parsed = path.parse(value);
 
-  const potentialSiblingOutput = outputFilename.replace(hashRegex, '').replace(/\.js$/, '.css');
+  const unhashedName = parsed.name.replace(hashRegex, '');
 
-  const found = Object.keys(metafile.outputs).find(output => output.replace(hashRegex, '') === potentialSiblingOutput);
-
-  return found ? { input: potentialSiblingEntry, output: found } : undefined;
-};
+  return path.join(parsed.dir, unhashedName + parsed.ext);
+}
 
 const fromEntries = (map: Map<string, string>, mergeWith: {[key: string]: string}): {[key: string]: string} => {
   const obj = Array.from(map).reduce((obj: {[key: string]: string}, [key, value]) => {

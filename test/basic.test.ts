@@ -287,10 +287,18 @@ test('it should map typescript files that import css', async () => {
   expect(metafileContents()).toEqual({'test/input/example-with-css/example-typescript.js': 'test/output/example-typescript.js', 'test/input/example-with-css/example-typescript.css': 'test/output/example-typescript.css'});
 });
 
-test('it should not include an imported image file that is not an explicit entrypoint', async () => {
+test('it should include an imported image file that is not an explicit entrypoint', async () => {
+  await require('esbuild').build(buildOptions({}, {entryPoints: ['test/input/example-with-image/example.js'], loader: {'.png': 'file'}}));
+
+  const contents = metafileContents();
+  expect(contents['test/input/example-with-image/example.js']).toMatch(/test\/output\/example-[^\.]+\.js/);
+  expect(contents['test/input/example-with-image/example.png']).toMatch(/test\/output\/example-[^\.]+\.png/);
+});
+
+test('it should include an imported image file that is not an explicit entrypoint (hash=false)', async () => {
   await require('esbuild').build(buildOptions({hash: false}, {entryPoints: ['test/input/example-with-image/example.js'], loader: {'.png': 'file'}}));
 
-  expect(metafileContents()).toEqual({'test/input/example-with-image/example.js': 'test/output/example.js'});
+  expect(metafileContents()).toEqual({'test/input/example-with-image/example.js': 'test/output/example.js', 'test/input/example-with-image/example.png': 'test/output/example.png'});
 });
 
 test('it should throw an error if the extensionless option is used with bundled css', async () => {
@@ -299,7 +307,7 @@ test('it should throw an error if the extensionless option is used with bundled 
   try {
     await require('esbuild').build(buildOptions({hash: false, extensionless: 'input'}, {entryPoints: ['test/input/example-with-css/example.js']}));
   } catch (e) {
-    expect(e.message).toMatch(/extensionless option cannot be used/);
+    expect(e.message).toMatch(/conflicting manifest key.+example\.js.+example\.css/);
   }
 });
 
