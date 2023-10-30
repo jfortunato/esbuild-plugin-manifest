@@ -78,7 +78,7 @@ Default: `undefined`
 
 A custom Function to create the manifest. The passed function should match the signature of `(entries: {[key: string]: string}) => Object`; and can return anything as long as it's serialisable by `JSON.stringify`.
 
-### `options.useEntryExtension`
+### `options.useEntrypointKeys`
 
 Type: `Boolean`
 
@@ -129,7 +129,7 @@ esbuild.build({
   entryPoints: ['src/index.ts'],
   bundle: true,
   outdir: 'output/',
-  plugins: [manifestPlugin({useEntryExtension: true})],
+  plugins: [manifestPlugin({useEntrypointKeys: true})],
 }).catch((e) => console.error(e.message))
 ```
 

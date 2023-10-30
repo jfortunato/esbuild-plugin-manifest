@@ -15,7 +15,7 @@ interface ManifestPluginOptions {
   shortNames?: OptionValue;
   filename?: string;
   extensionless?: OptionValue;
-  useEntryExtension?: boolean;
+  useEntrypointKeys?: boolean;
   append?: boolean;
   generate?: (entries: {[key: string]: string}) => Object;
 }
@@ -105,10 +105,10 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         let key = path.join(entrySrcDir, basename);
 
         // If the user specified the useEntryExtension option, we'll use the entrypoint filename as the key.
-        if (options.useEntryExtension && isEntryFile) {
-          // Cannot use the useEntryExtension option when the extensionless option is also being used
+        if (options.useEntrypointKeys && isEntryFile) {
+          // Cannot use the useEntrypointKeys option when the extensionless option is also being used
           if (options.extensionless === true || options.extensionless === 'input') {
-            throw new Error("The useEntryExtension option cannot be used when the extensionless option is also being used.");
+            throw new Error("The useEntrypointKeys option cannot be used when the extensionless option is also being used.");
           }
 
           key = info.outputInfo.entryPoint;

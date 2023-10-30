@@ -110,8 +110,8 @@ test('it should not throw an error if the short name has the same extension but 
   expect(metafileContents()).toEqual({'index.js': 'index.js', 'example.js': 'example.js'});
 });
 
-test('it should not throw an error if the entrypoints have the same name, different extensions, and the useEntryExtension option is used', async () => {
-  await require('esbuild').build(buildOptions({hash: false, shortNames: true, useEntryExtension: true}, {entryPoints: ['test/input/pages/home/index.js', 'test/input/pages/about/index.ts']}));
+test('it should not throw an error if the entrypoints have the same name, different extensions, and the useEntrypointKeys option is used', async () => {
+  await require('esbuild').build(buildOptions({hash: false, shortNames: true, useEntrypointKeys: true}, {entryPoints: ['test/input/pages/home/index.js', 'test/input/pages/about/index.ts']}));
 
   expect(metafileContents()).toEqual({'index.js': 'index.js', 'index.ts': 'index.js'});
 });
@@ -404,43 +404,43 @@ test('it should use the same extension as the output when it is changed via the 
   expect(metafileContents()).toEqual({'test/input/example.mjs': 'test/output/example.mjs'});
 });
 
-test('it should use the same extension as the entry with useEntryExtension option', async () => {
-  await require('esbuild').build(buildOptions({hash: false, useEntryExtension: true}, {outExtension: {'.js': '.mjs'}}));
+test('it should use the same extension as the entry with useEntrypointKeys option', async () => {
+  await require('esbuild').build(buildOptions({hash: false, useEntrypointKeys: true}, {outExtension: {'.js': '.mjs'}}));
 
   expect(metafileContents()).toEqual({'test/input/example.js': 'test/output/example.mjs'});
 });
 
-test('it should use the same extension as the entry with useEntryExtension option (typescript)', async () => {
-  await require('esbuild').build(buildOptions({hash: false, useEntryExtension: true}, {entryPoints: ['test/input/example.ts']}));
+test('it should use the same extension as the entry with useEntrypointKeys option (typescript)', async () => {
+  await require('esbuild').build(buildOptions({hash: false, useEntrypointKeys: true}, {entryPoints: ['test/input/example.ts']}));
 
   expect(metafileContents()).toEqual({'test/input/example.ts': 'test/output/example.js'});
 });
 
-test('it should use the same extension as the entry with useEntryExtension option when using outfile instead of outdir', async () => {
-  await require('esbuild').build(buildOptions({hash: false, useEntryExtension: true}, {outdir: undefined, outfile: 'test/output/out.mjs'}));
+test('it should use the same extension as the entry with useEntrypointKeys option when using outfile instead of outdir', async () => {
+  await require('esbuild').build(buildOptions({hash: false, useEntrypointKeys: true}, {outdir: undefined, outfile: 'test/output/out.mjs'}));
 
   expect(metafileContents()).toEqual({'test/input/example.js': 'test/output/out.mjs'});
 });
 
-test.each(['input', true])('it should not throw an error when using the useEntryExtension option with a compatible extensionless option', async (extensionlessOption) => {
+test.each(['input', true])('it should not throw an error when using the useEntrypointKeys option with a compatible extensionless option', async (extensionlessOption) => {
   expect.assertions(1);
 
   try {
-    await require('esbuild').build(buildOptions({hash: false, useEntryExtension: true, extensionless: extensionlessOption}));
+    await require('esbuild').build(buildOptions({hash: false, useEntrypointKeys: true, extensionless: extensionlessOption}));
   } catch (e) {
     // Just check that the error message mentions both options
-    expect(e.message).toMatch(/useEntryExtension.+extensionless/);
+    expect(e.message).toMatch(/useEntrypointKeys.+extensionless/);
   }
 });
 
-test.each(['output', false, undefined])('it should not throw an error when using the useEntryExtension option with a compatible extensionless option', async (extensionlessOption) => {
-  await require('esbuild').build(buildOptions({hash: false, useEntryExtension: true, extensionless: extensionlessOption}));
+test.each(['output', false, undefined])('it should not throw an error when using the useEntrypointKeys option with a compatible extensionless option', async (extensionlessOption) => {
+  await require('esbuild').build(buildOptions({hash: false, useEntrypointKeys: true, extensionless: extensionlessOption}));
 
   expect(fs.existsSync(OUTPUT_MANIFEST)).toBe(true);
 });
 
-test('it is able to use extensionless=output along with useEntryExtension', async () => {
-  await require('esbuild').build(buildOptions({hash: false, useEntryExtension: true, extensionless: 'output'}, {outExtension: {'.js': '.mjs'}}));
+test('it is able to use extensionless=output along with useEntrypointKeys', async () => {
+  await require('esbuild').build(buildOptions({hash: false, useEntrypointKeys: true, extensionless: 'output'}, {outExtension: {'.js': '.mjs'}}));
 
   expect(metafileContents()).toEqual({'test/input/example.js': 'test/output/example'});
 })
