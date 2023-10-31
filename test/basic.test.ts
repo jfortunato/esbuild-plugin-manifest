@@ -481,3 +481,15 @@ test('it supports multiple output formats by using append=true and running esbui
 
   expect(metafileContents()).toEqual({'test/output/example.mjs': 'test/output/example.mjs', 'test/output/example.cjs': 'test/output/example.cjs'});
 });
+
+test('it should keep the file when filter function returns true', async () => {
+  await require('esbuild').build(buildOptions({filter: (filename: string) => filename.match(/example/), hash: false}));
+
+  expect(metafileContents()).toEqual({"test/output/example.js": "test/output/example.js"});
+});
+
+test('it should remove the file when filter function returns false', async () => {
+  await require('esbuild').build(buildOptions({filter: (filename: string) => filename.match(/notFound/), hash: false}));
+
+  expect(metafileContents()).toEqual({});
+});

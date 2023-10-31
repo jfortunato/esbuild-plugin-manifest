@@ -11,6 +11,10 @@ import lockfile from 'proper-lockfile';
 
 type OptionValue = boolean | 'input' | 'output';
 
+interface ManifestEntries {
+  [key: string]: string
+}
+
 interface ManifestPluginOptions {
   hash?: boolean;
   shortNames?: OptionValue;
@@ -18,7 +22,8 @@ interface ManifestPluginOptions {
   extensionless?: OptionValue;
   useEntrypointKeys?: boolean;
   append?: boolean;
-  generate?: (entries: {[key: string]: string}) => Object;
+  generate?: (entries: ManifestEntries) => Object;
+  filter?: (filename: string) => boolean;
 }
 
 export = (options: ManifestPluginOptions = {}): Plugin => ({
@@ -98,7 +103,9 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
 
       const entries = fromEntries(mappings, existingManifest);
 
-      const resultObj = options.generate ? options.generate(entries) : entries;
+      const filteredEntries = options.filter ? filterEntries(entries, options.filter) : entries;
+
+      const resultObj = options.generate ? options.generate(filteredEntries) : filteredEntries;
 
       const text = JSON.stringify(resultObj, null, 2);
 
@@ -204,11 +211,20 @@ const unhashed = (value: string): string => {
   return path.join(parsed.dir, unhashedName + parsed.ext);
 };
 
-const fromEntries = (map: Map<string, string>, mergeWith: {[key: string]: string}): {[key: string]: string} => {
-  const obj = Array.from(map).reduce((obj: {[key: string]: string}, [key, value]) => {
+const fromEntries = (map: Map<string, string>, mergeWith: ManifestEntries): ManifestEntries => {
+  const obj = Array.from(map).reduce((obj: ManifestEntries, [key, value]) => {
     obj[key] = value;
     return obj;
   }, {});
 
   return {...mergeWith, ...obj};
+};
+
+const filterEntries = (entries: ManifestEntries, filterFunction: any): ManifestEntries => {
+  return Object.keys(entries)
+    .filter(filterFunction)
+    .reduce((obj: ManifestEntries, key) => {
+      obj[key] = entries[key] as string;
+      return obj;
+    }, {});
 };

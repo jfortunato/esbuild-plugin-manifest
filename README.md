@@ -78,6 +78,14 @@ Default: `undefined`
 
 A custom Function to create the manifest. The passed function should match the signature of `(entries: {[key: string]: string}) => Object`; and can return anything as long as it's serialisable by `JSON.stringify`.
 
+### `options.filter`
+
+Type: `Function`
+
+Default: `undefined`
+
+Allows filtering the files which make up the manifest. The passed function should match the signature of `(filename: string) => boolean`. Return `true` to keep the file, `false` to remove the file.
+
 ### `options.useEntrypointKeys`
 
 Type: `Boolean`
