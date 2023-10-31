@@ -11,6 +11,27 @@
 
 * Prevent multiple parallel builds from corrupting manifest file ([e0a713f](https://github.com/jfortunato/esbuild-plugin-manifest/commit/e0a713fdfa0f9d17259501427cb9765e7c2ad4a1))
 
+## [1.0.0](https://github.com/jfortunato/esbuild-plugin-manifest/compare/v0.7.0...v1.0.0) (2023-10-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* Base manifest keys off output directory
+* Previous versions would use the input (entrypoint) as the manifest key. To retain that same behavior, a new `useEntryExtension` option has been added.
+
+### Features
+
+* add filter option ([4a56e61](https://github.com/jfortunato/esbuild-plugin-manifest/commit/4a56e6101c2aef4a6d787175ff0009695bb15572))
+* Add filter option ([4a56e61](https://github.com/jfortunato/esbuild-plugin-manifest/commit/4a56e6101c2aef4a6d787175ff0009695bb15572))
+* Base manifest keys off output directory ([1bbbc59](https://github.com/jfortunato/esbuild-plugin-manifest/commit/1bbbc59d57e6341784b4c702675aeb7f6e8ba0db))
+* Include all outputs in manifest ([2c22050](https://github.com/jfortunato/esbuild-plugin-manifest/commit/2c22050df5b50a8e9b232e1e0119d20b4fc5c347))
+* Manifest keys are based on output filename by default ([f76c40c](https://github.com/jfortunato/esbuild-plugin-manifest/commit/f76c40cc649dd885516384c24af7994921b029ab))
+
+
+### Bug Fixes
+
+* Key for sibling css file in root directory no longer starts with slash ([7d0245a](https://github.com/jfortunato/esbuild-plugin-manifest/commit/7d0245affa2f1ad669332fc1d7d97bd5536f86f8))
+
 ## [v0.6.0]
 ### Fixed
 - Don't throw our own errors when the build result contains other errors.
