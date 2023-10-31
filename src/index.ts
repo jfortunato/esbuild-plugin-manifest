@@ -1,5 +1,6 @@
 import {
-  BuildResult, Metafile,
+  BuildOptions,
+  BuildResult,
   Plugin,
   PluginBuild
 } from 'esbuild';
@@ -18,11 +19,6 @@ interface ManifestPluginOptions {
   useEntrypointKeys?: boolean;
   append?: boolean;
   generate?: (entries: {[key: string]: string}) => Object;
-}
-
-interface EntrypointOutputInfo {
-  outputFilename: string;
-  outputInfo: Metafile['outputs'][keyof Metafile['outputs']];
 }
 
 export = (options: ManifestPluginOptions = {}): Plugin => ({
@@ -71,38 +67,11 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         mappings.set(input, output);
       }
 
-      // Get a map of each entrypoints output directory to its output info. When we loop through all the outputs
-      // this will allow us to determine the entrypoint for each output.
-      const outputDirToEntrypointOutputInfo: Map<string, any> = new Map();
       for (const outputFilename in result.metafile.outputs) {
-        const outputInfo = result.metafile.outputs[outputFilename]!;
-
-        // skip all outputs that don't have an entrypoint
-        if (!outputInfo.entryPoint) {
-          continue;
-        }
-
-        const info: EntrypointOutputInfo = {outputFilename: outputFilename, outputInfo: outputInfo};
-        outputDirToEntrypointOutputInfo.set(path.dirname(outputFilename), info);
-      }
-
-      for (const outputFilename in result.metafile.outputs) {
-        // Find the entrypoint for this output, and use its source directory as the base directory for the key.
-        const outputDir = path.dirname(outputFilename);
-        const info = outputDirToEntrypointOutputInfo.get(outputDir);
-
-        if (info === undefined) {
-          throw new Error("Could not find the entrypoint for the output '"+outputFilename+"'.");
-        }
+        let key = unhashed(outputFilename);
 
         // Are we processing the entrypoint file itself or a sibling/imported file?
-        const isEntryFile = info.outputFilename === outputFilename;
-        const entrySrcDir = path.dirname(info.outputInfo.entryPoint);
-
-        const unhashedFilename = unhashed(outputFilename, info.outputInfo.entryPoint, info.outputFilename);
-        const basename = path.basename(unhashedFilename);
-
-        let key = path.join(entrySrcDir, basename);
+        const isEntryFile = result.metafile.outputs[outputFilename]!.entryPoint !== undefined;
 
         // If the user specified the useEntryExtension option, we'll use the entrypoint filename as the key.
         if (options.useEntrypointKeys && isEntryFile) {
@@ -111,26 +80,13 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
             throw new Error("The useEntrypointKeys option cannot be used when the extensionless option is also being used.");
           }
 
-          key = info.outputInfo.entryPoint;
+          key = result.metafile.outputs[outputFilename]!.entryPoint!;
         }
 
         addMapping(key, outputFilename);
       }
 
-      if (build.initialOptions.outdir === undefined && build.initialOptions.outfile === undefined) {
-        throw new Error("You must specify an 'outdir' when generating a manifest file.");
-      }
-
-      let outdir = build.initialOptions.outdir || path.dirname(build.initialOptions.outfile!);
-
-      // If the user specified an absolute working directory, we'll need to resolve the outdir relative to that.
-      if (build.initialOptions.absWorkingDir !== undefined) {
-        outdir = path.resolve(build.initialOptions.absWorkingDir, outdir);
-      }
-
-      const filename = options.filename || 'manifest.json';
-
-      const fullPath = path.resolve(outdir, filename);
+      const fullPath = pathToManifest(build.initialOptions, options);
 
       // If the append option is used, we'll read the existing manifest file and merge it with the new entries.
       let existingManifest: {[key: string]: string} = {};
@@ -161,11 +117,27 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         return;
       }
 
-      writeFileWithLock(path.resolve(path.dirname(fullPath), 'metafile'), JSON.stringify(result.metafile, null, 2));
       return writeFileWithLock(fullPath, text);
     });
   }
 });
+
+const pathToManifest = (initialOptions: BuildOptions, pluginOptions: ManifestPluginOptions): string => {
+  if (initialOptions.outdir === undefined && initialOptions.outfile === undefined) {
+    throw new Error("You must specify an 'outdir' when generating a manifest file.");
+  }
+
+  let outdir = initialOptions.outdir || path.dirname(initialOptions.outfile!);
+
+  // If the user specified an absolute working directory, we'll need to resolve the outdir relative to that.
+  if (initialOptions.absWorkingDir !== undefined) {
+    outdir = path.resolve(initialOptions.absWorkingDir, outdir);
+  }
+
+  const filename = pluginOptions.filename || 'manifest.json';
+
+  return path.resolve(outdir, filename);
+};
 
 const writeFileWithLock = async (fullPath: string, text: string): Promise<void> => {
   // Retry up to 5 times, using exponential backoff but capped at 100ms between retries
@@ -222,30 +194,15 @@ const extensionless = (value: string): string => {
   return `${dir}${parsed.name}`;
 };
 
-const unhashed = (value: string, entrypointInput: string, entrypointOutput: string): string => {
-  // we need to determine the difference in filenames between the input and output of the entrypoint, so that we can
-  // use that same logic to match against a potential sibling file
-
-  // "example.js" => "example"
-  const entryWithoutExtension = path.parse(entrypointInput).name;
-
-  // "example-GQI5TWWV.js" => "example-GQI5TWWV"
-  const outputWithoutExtension = path.parse(entrypointOutput).name;
-
-  // "example-GQI5TWWV" => "-GQI5TWWV"
-  const diff = outputWithoutExtension.replace(entryWithoutExtension, '');
-
-  // esbuild uses [A-Z0-9]{8} as the hash, and that is not currently configurable so we should be able
-  // to match that exactly in the diff and replace it with the regex so we're left with:
-  // "-GQI5TWWV" => "-[A-Z0-9]{8}"
-  const hashRegex = new RegExp(diff.replace(/[A-Z0-9]{8}/, '[A-Z0-9]{8}'));
-
+const unhashed = (value: string): string => {
   const parsed = path.parse(value);
 
-  const unhashedName = parsed.name.replace(hashRegex, '');
+  // esbuild uses [A-Z0-9]{8} as the hash, and that is not currently configurable so we will match that exactly
+  // along with any preceding character that may be a dot or a dash
+  const unhashedName = parsed.name.replace(new RegExp(`[-\.]?[A-Z0-9]{8}`), '');
 
   return path.join(parsed.dir, unhashedName + parsed.ext);
-}
+};
 
 const fromEntries = (map: Map<string, string>, mergeWith: {[key: string]: string}): {[key: string]: string} => {
   const obj = Array.from(map).reduce((obj: {[key: string]: string}, [key, value]) => {
