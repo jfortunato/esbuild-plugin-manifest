@@ -28,11 +28,11 @@ esbuild.build({
 }).catch((e) => console.error(e.message))
 ```
 
-This will generate a `manifest.json` in the output directory with a mapping of all the source filenames to their corresponding hashed output filename:
+This will generate a `manifest.json` in the output directory with a mapping of all the unhashed filenames to their corresponding hashed output filename:
 
 ```json
 {
-  "src/index.js": "output/index-4QTUNIID.js"
+  "output/index.js": "output/index-4QTUNIID.js"
 }
 ```
 
@@ -52,7 +52,7 @@ Type: `Boolean` | 'input' | 'output'
 
 Default: false
 
-By default we will use the full input and output paths `{"src/index.js":"output/index-4QTUNIID.js"}`, but when this option is enabled it will use the basename of the files `{"index.js":"index-4QTUNIID.js"}`
+By default we will use the full input and output paths `{"output/index.js":"output/index-4QTUNIID.js"}`, but when this option is enabled it will use the basename of the files `{"index.js":"index-4QTUNIID.js"}`
 
 ### `options.extensionless`
 
@@ -60,7 +60,7 @@ Type: `Boolean` | `'input'` | `'output'`
 
 Default: false
 
-We'll keep all file extensions by default, but you can specify `true` to remove them from both or one of `'input'` or `'output'` to only remove them from the input or output respectively. Eg: specifying `manifestPlugin({ extensionless: 'input' })` will result in `{"src/index":"output/index-4QTUNIID.js"}`
+We'll keep all file extensions by default, but you can specify `true` to remove them from both or one of `'input'` or `'output'` to only remove them from the input or output respectively. Eg: specifying `manifestPlugin({ extensionless: 'input' })` will result in `{"output/index":"output/index-4QTUNIID.js"}`
 
 ### `options.filename`
 
@@ -122,7 +122,7 @@ esbuild.build({
 ```json5
 // manifest.json
 {
-  "src/index.js": "output/index-4QTUNIID.js"
+  "output/index.js": "output/index-4QTUNIID.js"
 }
 ```
 
@@ -177,7 +177,7 @@ await esbuild.build({
 ```json5
 // manifest.json
 {
-  "src/index.js": "output/index-4QTUNIID.js",
-  "src/index.mjs": "output/index-5RUVOJJE.mjs"
+  "output/index.js": "output/index-4QTUNIID.js",
+  "output/index.mjs": "output/index-5RUVOJJE.mjs"
 }
 ```
