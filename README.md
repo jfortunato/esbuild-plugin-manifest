@@ -161,6 +161,7 @@ await esbuild.build({
   entryPoints: ['src/index.js'],
   bundle: true,
   outdir: 'output/',
+  format: 'cjs',
   plugins: [manifestPlugin()],
 }).catch((e) => console.error(e.message))
 
@@ -168,6 +169,7 @@ await esbuild.build({
   entryPoints: ['src/index.js'],
   bundle: true,
   outdir: 'output/',
+  format: 'esm',
   outExtension: { '.js': '.mjs' },
   plugins: [manifestPlugin({ append: true })],
 }).catch((e) => console.error(e.message))
