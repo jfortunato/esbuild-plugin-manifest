@@ -16,6 +16,13 @@
 
 * Key for sibling css file in root directory no longer starts with slash ([7d0245a](https://github.com/jfortunato/esbuild-plugin-manifest/commit/7d0245affa2f1ad669332fc1d7d97bd5536f86f8))
 
+## [1.0.1](https://github.com/jfortunato/esbuild-plugin-manifest/compare/v1.0.0...v1.0.1) (2023-12-06)
+
+
+### Bug Fixes
+
+* The `extensionless` option now accounts for filenames with multiple extensions ([f88cfd7](https://github.com/jfortunato/esbuild-plugin-manifest/commit/f88cfd7e54c91af22a9701f14291bbd0470babd7))
+
 ## [0.7.0](https://github.com/jfortunato/esbuild-plugin-manifest/compare/v0.6.0...v0.7.0) (2023-10-26)
 
 
