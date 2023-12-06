@@ -198,7 +198,11 @@ const extensionless = (value: string): string => {
 
   const dir = parsed.dir !== '' ? `${parsed.dir}/` : '';
 
-  return `${dir}${parsed.name}`;
+  // Consider the "extensionless" name of the file to be the name up until the first dot. That way a file like
+  // "example.min.js" will be considered "example" and not "example.min" (which parsed.name would consider the result to be).
+  const extensionlessName = parsed.base.split('.')[0];
+
+  return `${dir}${extensionlessName}`;
 };
 
 const unhashed = (value: string): string => {

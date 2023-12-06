@@ -349,6 +349,25 @@ test('it should allow an extensionless output with shortnames', async () => {
   expect(metafileContents()).toEqual({'example.js': 'example'});
 });
 
+test.each([
+  {
+    name: 'extensionless input with multiple extensions (via outExtension)',
+    extensionless: 'input',
+    outExtension: {'.js': '.min.js'},
+    expected: {'test/output/example': 'test/output/example.min.js'},
+  },
+  {
+    name: 'extensionless output with multiple extensions (via outExtension)',
+    extensionless: 'output',
+    outExtension: {'.js': '.min.js'},
+    expected: {'test/output/example.min.js': 'test/output/example'},
+  },
+])('it should allow the extensionless option on a file with multiple extensions', async (options) => {
+  await require('esbuild').build(buildOptions({hash: false, extensionless: options.extensionless}, {outExtension: options.outExtension}));
+
+  expect(metafileContents()).toEqual(options.expected);
+});
+
 test('it should not throw an error with esbuild write=false option', async () => {
   await require('esbuild').build(buildOptions({}, {write: false}));
 
