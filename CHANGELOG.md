@@ -16,6 +16,13 @@
 
 * Key for sibling css file in root directory no longer starts with slash ([7d0245a](https://github.com/jfortunato/esbuild-plugin-manifest/commit/7d0245affa2f1ad669332fc1d7d97bd5536f86f8))
 
+## [1.0.2](https://github.com/jfortunato/esbuild-plugin-manifest/compare/v1.0.1...v1.0.2) (2023-12-13)
+
+
+### Bug Fixes
+
+* Retain .map extension for sourcemaps with extensionless option. ([e9ab4cb](https://github.com/jfortunato/esbuild-plugin-manifest/commit/e9ab4cb223ead91be8eaf7dfd127b5e0877512f0))
+
 ## [1.0.1](https://github.com/jfortunato/esbuild-plugin-manifest/compare/v1.0.0...v1.0.1) (2023-12-06)
 
 
