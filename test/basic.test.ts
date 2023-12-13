@@ -353,17 +353,29 @@ test.each([
   {
     name: 'extensionless input with multiple extensions (via outExtension)',
     extensionless: 'input',
-    outExtension: {'.js': '.min.js'},
+    buildOptions: { outExtension: {'.js': '.min.js'} },
     expected: {'test/output/example': 'test/output/example.min.js'},
   },
   {
     name: 'extensionless output with multiple extensions (via outExtension)',
     extensionless: 'output',
-    outExtension: {'.js': '.min.js'},
+    buildOptions: { outExtension: {'.js': '.min.js'} },
     expected: {'test/output/example.min.js': 'test/output/example'},
   },
+  {
+    name: 'extensionless input should retain .map extension for sourcemaps',
+    extensionless: 'input',
+    buildOptions: { sourcemap: true },
+    expected: {'test/output/example.map': 'test/output/example.js.map', 'test/output/example': 'test/output/example.js'},
+  },
+  {
+    name: 'extensionless output should retain .map extension for sourcemaps',
+    extensionless: 'output',
+    buildOptions: { sourcemap: true },
+    expected: {'test/output/example.js.map': 'test/output/example.map', 'test/output/example.js': 'test/output/example'},
+  },
 ])('it should allow the extensionless option on a file with multiple extensions', async (options) => {
-  await require('esbuild').build(buildOptions({hash: false, extensionless: options.extensionless}, {outExtension: options.outExtension}));
+  await require('esbuild').build(buildOptions({hash: false, extensionless: options.extensionless}, options.buildOptions));
 
   expect(metafileContents()).toEqual(options.expected);
 });

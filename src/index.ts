@@ -200,7 +200,12 @@ const extensionless = (value: string): string => {
 
   // Consider the "extensionless" name of the file to be the name up until the first dot. That way a file like
   // "example.min.js" will be considered "example" and not "example.min" (which parsed.name would consider the result to be).
-  const extensionlessName = parsed.base.split('.')[0];
+  let extensionlessName = parsed.base.split('.')[0];
+
+  // Retain the .map extension on source map files, otherwise there will be a conflict with the actual source file.
+  if (parsed.ext === '.map') {
+    extensionlessName += '.map';
+  }
 
   return `${dir}${extensionlessName}`;
 };
