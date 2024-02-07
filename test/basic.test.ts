@@ -524,3 +524,14 @@ test('it should remove the file when filter function returns false', async () =>
 
   expect(metafileContents()).toEqual({});
 });
+
+test('it should use the hashed filename of chunks as keys when splitting is enabled', async () => {
+  await require('esbuild').build(buildOptions({}, {
+    entryPoints: ['test/input/splitting/index.js', 'test/input/splitting/home.js', 'test/input/splitting/about.js'],
+    splitting: true,
+    format: 'esm',
+  }));
+
+  expect(metafileContents()['test/output/chunk-JYYV63CZ.js']).toEqual('test/output/chunk-JYYV63CZ.js');
+  expect(metafileContents()['test/output/chunk-VDNVJE6B.js']).toEqual('test/output/chunk-VDNVJE6B.js');
+});

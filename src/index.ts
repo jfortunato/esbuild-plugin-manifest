@@ -73,7 +73,15 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
       }
 
       for (const outputFilename in result.metafile.outputs) {
+        // Strip the hash from the output filename.
         let key = unhashed(outputFilename);
+
+        // When code splitting is used, every chunk will be named "chunk.HASH.js". That means when there are multiple chunks,
+        // every unhashed filename would be "chunk.js", which would cause a conflict in the manifest. So for chunks we'll just
+        // use the output filename including the hash as the key.
+        if (path.parse(key).name === 'chunk') {
+          key = outputFilename;
+        }
 
         // Are we processing the entrypoint file itself or a sibling/imported file?
         const isEntryFile = result.metafile.outputs[outputFilename]!.entryPoint !== undefined;
