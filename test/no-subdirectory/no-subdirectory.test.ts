@@ -18,6 +18,6 @@ test('it should use the proper keys for the manifest when building from the same
 
   // Remove the test artifacts
   fs.unlinkSync(path.join('test', 'no-subdirectory', 'manifest.json'));
-  fs.unlinkSync(path.join('test', 'no-subdirectory', contents['example.js']));
-  fs.unlinkSync(path.join('test', 'no-subdirectory', contents['example.css']));
+  fs.unlinkSync(path.join('test', 'no-subdirectory', contents['example.js'].file));
+  fs.unlinkSync(path.join('test', 'no-subdirectory', contents['example.css'].file));
 });
