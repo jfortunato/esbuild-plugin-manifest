@@ -21,6 +21,9 @@
     "type": "git",
     "url": "https://github.com/jfortunato/esbuild-plugin-manifest"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "devDependencies": {
     "@types/jest": "^26.0.23",
     "@types/proper-lockfile": "^4.1.3",
