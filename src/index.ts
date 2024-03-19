@@ -8,11 +8,24 @@ import fs from 'fs';
 import path from 'path';
 import util from 'util';
 import lockfile from 'proper-lockfile';
+import mime from 'mime';
+
+import {createHash} from 'crypto';
 
 type OptionValue = boolean | 'input' | 'output';
 
+interface ManifestEntry {
+  file: string,
+  source: string,
+  basename: string,
+  extension: string,
+  mediaType: string | null,
+  integrity: string,
+  etag: string,
+}
+
 interface ManifestEntries {
-  [key: string]: string
+  [key: string]: ManifestEntry
 }
 
 interface ManifestPluginOptions {
@@ -102,11 +115,12 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
       const fullPath = pathToManifest(build.initialOptions, options);
 
       // If the append option is used, we'll read the existing manifest file and merge it with the new entries.
-      let existingManifest: {[key: string]: string} = {};
+      let existingManifest: { [key: string]: ManifestEntry } = {};
       if (options.append) {
         try {
           existingManifest = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
-        } catch (e) { }
+        } catch (e) {
+        }
       }
 
       const entries = fromEntries(mappings, existingManifest);
@@ -193,7 +207,7 @@ const ensureFile = async (fullPath: string): Promise<void> => {
   }
 };
 
-const shouldModify = (inputOrOutput: 'input'|'output', optionValue?: OptionValue): boolean => {
+const shouldModify = (inputOrOutput: 'input' | 'output', optionValue?: OptionValue): boolean => {
   return optionValue === inputOrOutput || optionValue === true;
 };
 
@@ -228,9 +242,17 @@ const unhashed = (value: string): string => {
   return path.join(parsed.dir, unhashedName + parsed.ext);
 };
 
+const integrity = (fileContent: Buffer): string => {
+  return createHash("sha384").update(fileContent).digest("base64")
+}
+
+const etag = (fileContent: Buffer): string => {
+  return createHash("md5").update(fileContent).digest("hex");
+}
+
 const fromEntries = (map: Map<string, string>, mergeWith: ManifestEntries): ManifestEntries => {
   const obj = Array.from(map).reduce((obj: ManifestEntries, [key, value]) => {
-    obj[key] = value;
+    obj[key] = toManifestEntry(key, value);
     return obj;
   }, {});
 
@@ -241,7 +263,21 @@ const filterEntries = (entries: ManifestEntries, filterFunction: any): ManifestE
   return Object.keys(entries)
     .filter(filterFunction)
     .reduce((obj: ManifestEntries, key) => {
-      obj[key] = entries[key] as string;
+      obj[key] = entries[key] as ManifestEntry;
       return obj;
     }, {});
 };
+
+const toManifestEntry = (originalPath: string, hashedPath: string): ManifestEntry => {
+  const parsed = path.parse(hashedPath);
+  const fileContent = fs.readFileSync(hashedPath);
+  return {
+    file: hashedPath,
+    source: originalPath,
+    basename: parsed.base,
+    extension: parsed.ext,
+    mediaType: mime.getType(parsed.name),
+    integrity: integrity(fileContent),
+    etag: etag(fileContent),
+  };
+}
