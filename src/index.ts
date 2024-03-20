@@ -257,8 +257,10 @@ const unhashed = (value: string): string => {
 };
 
 const integrity = (fileContent: Buffer | string): string => {
-  return createHash("sha384").update(fileContent).digest("base64")
-}
+  const algorithm = "sha384";
+  const hash = createHash(algorithm).update(fileContent).digest("base64");
+  return `${algorithm}-${hash}`;
+};
 
 const etag = (fileContent: Buffer | string): string => {
   return createHash("md5").update(fileContent).digest("hex");

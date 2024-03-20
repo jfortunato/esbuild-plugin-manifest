@@ -75,7 +75,7 @@ test('it should generate long names by default', async () => {
     "test/output/example.js": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "test/output/example.js",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/output/example.js",
     }
   });
@@ -88,7 +88,7 @@ test('it should generate short names if specified', async () => {
     "example.js": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "example.js",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/output/example.js"
     }
   });
@@ -101,7 +101,7 @@ test('it should allow a short name for the input only', async () => {
     "example.js": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "test/output/example.js",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/output/example.js",
     }
   });
@@ -114,7 +114,7 @@ test('it should allow a short name for the output only', async () => {
     "test/output/example.js": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "example.js",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/output/example.js"
     }
   });
@@ -142,13 +142,13 @@ test('it should not throw an error if the short name has the same extension but 
     "example.js": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "example.js",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/output/example.js"
     },
     "index.js": {
       "etag": "4694eb03ef8c45e99982c1498c14b5d7",
       "file": "index.js",
-      "integrity": "bxjaJQy+wK5iAuw4M2hS7WVPApv9sSfXyDSrlxL6ZcK2Io774FFqHhRP1HRSvy0R",
+      "integrity": "sha384-bxjaJQy+wK5iAuw4M2hS7WVPApv9sSfXyDSrlxL6ZcK2Io774FFqHhRP1HRSvy0R",
       "source": "test/output/pages/home/index.js"
     }
   });
@@ -165,13 +165,13 @@ test('it should not throw an error if the entrypoints have the same name, differ
     "index.js": {
       "etag": "4694eb03ef8c45e99982c1498c14b5d7",
       "file": "index.js",
-      "integrity": "bxjaJQy+wK5iAuw4M2hS7WVPApv9sSfXyDSrlxL6ZcK2Io774FFqHhRP1HRSvy0R",
+      "integrity": "sha384-bxjaJQy+wK5iAuw4M2hS7WVPApv9sSfXyDSrlxL6ZcK2Io774FFqHhRP1HRSvy0R",
       "source": "test/input/pages/home/index.js"
     },
     "index.ts": {
       "etag": "13a53b958519519ded3a10eb701db4be",
       "file": "index.js",
-      "integrity": "rCk2iikSVs/QfYt1NljFRP3vJBg/wlwOK1jWzb943CGfmzTAT91jqEPib+N7s9KN",
+      "integrity": "sha384-rCk2iikSVs/QfYt1NljFRP3vJBg/wlwOK1jWzb943CGfmzTAT91jqEPib+N7s9KN",
       "source": "test/input/pages/about/index.ts"
     }
   });
@@ -256,25 +256,25 @@ test('it should allow multiple entrypoints with same css', async () => {
     "test/output/example.css": {
       "etag": "d861a27cb8083dd5a254c18fb47036e1",
       "file": "test/output/example.css",
-      "integrity": "az72to4rJ+UHsi96ok0AiWeFPEL974GZLzlmg0P1gGVQSVyZTLfyyXUmioJH6T3y",
+      "integrity": "sha384-az72to4rJ+UHsi96ok0AiWeFPEL974GZLzlmg0P1gGVQSVyZTLfyyXUmioJH6T3y",
       "source": "test/output/example.css",
     },
     "test/output/example.js": {
       "etag": "c702abdf049a2f21bc15ad6b7829e98a",
       "file": "test/output/example.js",
-      "integrity": "KCCZhbucz5r84a/4NBJ73lBIeOoglm70UBvXSWXEZgu3vUvoX/6mCeJOoLRtDaTv",
+      "integrity": "sha384-KCCZhbucz5r84a/4NBJ73lBIeOoglm70UBvXSWXEZgu3vUvoX/6mCeJOoLRtDaTv",
       "source": "test/output/example.js",
     },
     "test/output/example2.css": {
       "etag": "d861a27cb8083dd5a254c18fb47036e1",
       "file": "test/output/example2.css",
-      "integrity": "az72to4rJ+UHsi96ok0AiWeFPEL974GZLzlmg0P1gGVQSVyZTLfyyXUmioJH6T3y",
+      "integrity": "sha384-az72to4rJ+UHsi96ok0AiWeFPEL974GZLzlmg0P1gGVQSVyZTLfyyXUmioJH6T3y",
       "source": "test/output/example2.css",
     },
     "test/output/example2.js": {
       "etag": "6996645e5faeb5f6f9411bceb729f0d0",
       "file": "test/output/example2.js",
-      "integrity": "Jzra72/2c7bse1t3ubEL+TE+9jkiw4tdmKn8jtTi8XljfHf/pjzycKv4195VE2za",
+      "integrity": "sha384-Jzra72/2c7bse1t3ubEL+TE+9jkiw4tdmKn8jtTi8XljfHf/pjzycKv4195VE2za",
       "source": "test/output/example2.js",
     },
   });
@@ -287,13 +287,13 @@ test('it should include an imported css file that is not an explicit entrypoint'
     "test/output/example.css": {
       "etag": "d861a27cb8083dd5a254c18fb47036e1",
       "file": "test/output/example.css",
-      "integrity": "az72to4rJ+UHsi96ok0AiWeFPEL974GZLzlmg0P1gGVQSVyZTLfyyXUmioJH6T3y",
+      "integrity": "sha384-az72to4rJ+UHsi96ok0AiWeFPEL974GZLzlmg0P1gGVQSVyZTLfyyXUmioJH6T3y",
       "source": "test/output/example.css",
     },
     "test/output/example.js": {
       "etag": "c702abdf049a2f21bc15ad6b7829e98a",
       "file": "test/output/example.js",
-      "integrity": "KCCZhbucz5r84a/4NBJ73lBIeOoglm70UBvXSWXEZgu3vUvoX/6mCeJOoLRtDaTv",
+      "integrity": "sha384-KCCZhbucz5r84a/4NBJ73lBIeOoglm70UBvXSWXEZgu3vUvoX/6mCeJOoLRtDaTv",
       "source": "test/output/example.js",
     },
   });
@@ -306,13 +306,13 @@ test('it should map a sibling css file when no hash is used', async () => {
     "test/output/example.css": {
       "etag": "d861a27cb8083dd5a254c18fb47036e1",
       "file": "test/output/example.css",
-      "integrity": "az72to4rJ+UHsi96ok0AiWeFPEL974GZLzlmg0P1gGVQSVyZTLfyyXUmioJH6T3y",
+      "integrity": "sha384-az72to4rJ+UHsi96ok0AiWeFPEL974GZLzlmg0P1gGVQSVyZTLfyyXUmioJH6T3y",
       "source": "test/output/example.css",
     },
     "test/output/example.js": {
       "etag": "c702abdf049a2f21bc15ad6b7829e98a",
       "file": "test/output/example.js",
-      "integrity": "KCCZhbucz5r84a/4NBJ73lBIeOoglm70UBvXSWXEZgu3vUvoX/6mCeJOoLRtDaTv",
+      "integrity": "sha384-KCCZhbucz5r84a/4NBJ73lBIeOoglm70UBvXSWXEZgu3vUvoX/6mCeJOoLRtDaTv",
       "source": "test/output/example.js",
     },
   });
@@ -363,13 +363,13 @@ test('it should map a sibling css file when the hash comes before a suffix', asy
   expect(contents['test/output/example-FOO.js']).toEqual({
     "etag": "c702abdf049a2f21bc15ad6b7829e98a",
     "file": "test/output/example-UDCOIXTA-FOO.js",
-    "integrity": "KCCZhbucz5r84a/4NBJ73lBIeOoglm70UBvXSWXEZgu3vUvoX/6mCeJOoLRtDaTv",
+    "integrity": "sha384-KCCZhbucz5r84a/4NBJ73lBIeOoglm70UBvXSWXEZgu3vUvoX/6mCeJOoLRtDaTv",
     "source": "test/output/example-FOO.js"
   });
   expect(contents['test/output/example-FOO.css']).toEqual({
     "etag": "d861a27cb8083dd5a254c18fb47036e1",
     "file": "test/output/example-ZNREH66Y-FOO.css",
-    "integrity": "az72to4rJ+UHsi96ok0AiWeFPEL974GZLzlmg0P1gGVQSVyZTLfyyXUmioJH6T3y",
+    "integrity": "sha384-az72to4rJ+UHsi96ok0AiWeFPEL974GZLzlmg0P1gGVQSVyZTLfyyXUmioJH6T3y",
     "source": "test/output/example-FOO.css"
   });
 });
@@ -385,13 +385,13 @@ test('it should map a sibling css file when the hash runs up directly against a 
   expect(contents['test/output/exampleFOO.js']).toEqual({
     "etag": "c702abdf049a2f21bc15ad6b7829e98a",
     "file": "test/output/example-WYQNDWQXFOO.js",
-    "integrity": "KCCZhbucz5r84a/4NBJ73lBIeOoglm70UBvXSWXEZgu3vUvoX/6mCeJOoLRtDaTv",
+    "integrity": "sha384-KCCZhbucz5r84a/4NBJ73lBIeOoglm70UBvXSWXEZgu3vUvoX/6mCeJOoLRtDaTv",
     "source": "test/output/exampleFOO.js"
   });
   expect(contents['test/output/exampleFOO.css']).toEqual({
     "etag": "d861a27cb8083dd5a254c18fb47036e1",
     "file": "test/output/example-UWCVZI52FOO.css",
-    "integrity": "az72to4rJ+UHsi96ok0AiWeFPEL974GZLzlmg0P1gGVQSVyZTLfyyXUmioJH6T3y",
+    "integrity": "sha384-az72to4rJ+UHsi96ok0AiWeFPEL974GZLzlmg0P1gGVQSVyZTLfyyXUmioJH6T3y",
     "source": "test/output/exampleFOO.css"
   });
 });
@@ -424,7 +424,7 @@ test('it should not attempt to find a sibling for a css entrypoint ', async () =
   expect(contents['test/output/global.css']).toEqual({
     "etag": "d861a27cb8083dd5a254c18fb47036e1",
     "file": "test/output/global-O7H3HB2W.css",
-    "integrity": "az72to4rJ+UHsi96ok0AiWeFPEL974GZLzlmg0P1gGVQSVyZTLfyyXUmioJH6T3y",
+    "integrity": "sha384-az72to4rJ+UHsi96ok0AiWeFPEL974GZLzlmg0P1gGVQSVyZTLfyyXUmioJH6T3y",
     "source": "test/output/global.css"
   });
 });
@@ -436,7 +436,7 @@ test('it should map typescript files', async () => {
     "test/output/example.js": {
       "etag": "b8e7263e946f16015d9d6db02f3ea3b1",
       "file": "test/output/example.js",
-      "integrity": "hTC9oniqF+c+oZF7Ih9oq7MrmKdpzzzK9/fAvd+TzCYsZ5M3PDNSXGzL2yMh42fD",
+      "integrity": "sha384-hTC9oniqF+c+oZF7Ih9oq7MrmKdpzzzK9/fAvd+TzCYsZ5M3PDNSXGzL2yMh42fD",
       "source": "test/output/example.js",
     },
   });
@@ -449,13 +449,13 @@ test('it should map typescript files that import css', async () => {
     "test/output/example-typescript.css": {
       "etag": "5d973b46d8bc32e2ca36ebd17fe45756",
       "file": "test/output/example-typescript.css",
-      "integrity": "oauGpxKpeTGp8YcjhX2S+025hwtt3IfvDoDLsYGYT4hBADaX8H58dbMFja9nTIHD",
+      "integrity": "sha384-oauGpxKpeTGp8YcjhX2S+025hwtt3IfvDoDLsYGYT4hBADaX8H58dbMFja9nTIHD",
       "source": "test/output/example-typescript.css",
     },
     "test/output/example-typescript.js": {
       "etag": "0712815050e4ce939f571f14d4ca6a93",
       "file": "test/output/example-typescript.js",
-      "integrity": "j1BAaq6Qu9eI0X8U43QxFNSGokmo7iEdSduzPQ/Oi98tYAOobBLvMUG+FXThNHig",
+      "integrity": "sha384-j1BAaq6Qu9eI0X8U43QxFNSGokmo7iEdSduzPQ/Oi98tYAOobBLvMUG+FXThNHig",
       "source": "test/output/example-typescript.js",
     },
   });
@@ -471,13 +471,13 @@ test('it should include an imported image file that is not an explicit entrypoin
   expect(contents['test/output/example.js']).toEqual({
     "etag": "844cdacd41353249adeddc8c3fffc6e4",
     "file": "test/output/example-7MNN44HF.js",
-    "integrity": "9NBVdQZdfB1bA4KKddlkLNBz4LnSSSH9EZsmZCesPzyPY9T2qispM/M3ojVie0fi",
+    "integrity": "sha384-9NBVdQZdfB1bA4KKddlkLNBz4LnSSSH9EZsmZCesPzyPY9T2qispM/M3ojVie0fi",
     "source": "test/output/example.js"
   });
   expect(contents['test/output/example.png']).toEqual({
     "etag": "63d5a027014895f42d4deb864d539d58",
     "file": "test/output/example-KI5UE55D.png",
-    "integrity": "RCAoIWtw46cYknOSs7fjnkvHvA/KAXGw0Q8UGXheWn2kV8jdArT+MR7lBCnE0L+V",
+    "integrity": "sha384-RCAoIWtw46cYknOSs7fjnkvHvA/KAXGw0Q8UGXheWn2kV8jdArT+MR7lBCnE0L+V",
     "source": "test/output/example.png"
   });
 });
@@ -492,13 +492,13 @@ test('it should include an imported image file that is not an explicit entrypoin
     "test/output/example.js": {
       "etag": "931516d3df03faf2924e21a6e7186e69",
       "file": "test/output/example.js",
-      "integrity": "gCUZmV3iwU2cGCbRh8pkGzpHq8l2MQgbPA8iVywuq9w8oIVH0uu1U5ZUOQvlc17O",
+      "integrity": "sha384-gCUZmV3iwU2cGCbRh8pkGzpHq8l2MQgbPA8iVywuq9w8oIVH0uu1U5ZUOQvlc17O",
       "source": "test/output/example.js",
     },
     "test/output/example.png": {
       "etag": "63d5a027014895f42d4deb864d539d58",
       "file": "test/output/example.png",
-      "integrity": "RCAoIWtw46cYknOSs7fjnkvHvA/KAXGw0Q8UGXheWn2kV8jdArT+MR7lBCnE0L+V",
+      "integrity": "sha384-RCAoIWtw46cYknOSs7fjnkvHvA/KAXGw0Q8UGXheWn2kV8jdArT+MR7lBCnE0L+V",
       "source": "test/output/example.png",
     },
   });
@@ -515,13 +515,13 @@ test('it should include assets placed inside their own directory within the outd
   expect(contents['test/output/example.js']).toEqual({
     "etag": "3206b527f8b6495859575f938f746811",
     "file": "test/output/example-RHTDZ42D.js",
-    "integrity": "S/8Dnj1T9HYLMP4GTf9MAmXHXezOEOocWbjA7xCp51YGfJJBVxEs9YCWPqeBYzDD",
+    "integrity": "sha384-S/8Dnj1T9HYLMP4GTf9MAmXHXezOEOocWbjA7xCp51YGfJJBVxEs9YCWPqeBYzDD",
     "source": "test/output/example.js"
   });
   expect(contents['test/output/assets/example.png']).toEqual({
     "etag": "63d5a027014895f42d4deb864d539d58",
     "file": "test/output/assets/example-KI5UE55D.png",
-    "integrity": "RCAoIWtw46cYknOSs7fjnkvHvA/KAXGw0Q8UGXheWn2kV8jdArT+MR7lBCnE0L+V",
+    "integrity": "sha384-RCAoIWtw46cYknOSs7fjnkvHvA/KAXGw0Q8UGXheWn2kV8jdArT+MR7lBCnE0L+V",
     "source": "test/output/assets/example.png"
   });
 });
@@ -546,7 +546,7 @@ test('it should allow an extensionless input', async () => {
     "test/output/example": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "test/output/example.js",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/output/example.js",
     },
   });
@@ -559,7 +559,7 @@ test('it should allow an extensionless output', async () => {
     "test/output/example.js": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "test/output/example",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/output/example.js"
     }
   });
@@ -572,7 +572,7 @@ test('it should allow an extensionless input and output by specifying true', asy
     "test/output/example": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "test/output/example",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/output/example.js"
     }
   });
@@ -585,7 +585,7 @@ test('it should allow an extensionless input with shortnames', async () => {
     "example": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "example.js",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/output/example.js"
     }
   });
@@ -598,7 +598,7 @@ test('it should allow an extensionless output with shortnames', async () => {
     "example.js": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "example",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/output/example.js"
     }
   });
@@ -613,7 +613,7 @@ test.each([
       "test/output/example": {
         "etag": "b10922b033167718e2b3031052833770",
         "file": "test/output/example.min.js",
-        "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+        "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
         "source": "test/output/example.min.js",
       },
     },
@@ -626,7 +626,7 @@ test.each([
       "test/output/example.min.js": {
         "etag": "b10922b033167718e2b3031052833770",
         "file": "test/output/example",
-        "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+        "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
         "source": "test/output/example.min.js",
       },
     },
@@ -639,13 +639,13 @@ test.each([
       "test/output/example": {
         "etag": "e049bae6042c2875a1a08f0b2e861427",
         "file": "test/output/example.js",
-        "integrity": "/uyTIa7xg4L04bUJBKjW5z6scVAZxR6hiKbMLD6mjzLc+5bmdZhejw9WyCYAYgeA",
+        "integrity": "sha384-/uyTIa7xg4L04bUJBKjW5z6scVAZxR6hiKbMLD6mjzLc+5bmdZhejw9WyCYAYgeA",
         "source": "test/output/example.js",
       },
       "test/output/example.map": {
         "etag": "cb342b2c6d735815d8e4e7cbde0aa369",
         "file": "test/output/example.js.map",
-        "integrity": "1KaNWheI8TZhtGHASFaPrXP+V31dIRKhtp1tWSJQ/tw25LcmrK3WgLJ0/ta+QB4r",
+        "integrity": "sha384-1KaNWheI8TZhtGHASFaPrXP+V31dIRKhtp1tWSJQ/tw25LcmrK3WgLJ0/ta+QB4r",
         "source": "test/output/example.js.map",
       },
     },
@@ -658,13 +658,13 @@ test.each([
       "test/output/example.js": {
         "etag": "e049bae6042c2875a1a08f0b2e861427",
         "file": "test/output/example",
-        "integrity": "/uyTIa7xg4L04bUJBKjW5z6scVAZxR6hiKbMLD6mjzLc+5bmdZhejw9WyCYAYgeA",
+        "integrity": "sha384-/uyTIa7xg4L04bUJBKjW5z6scVAZxR6hiKbMLD6mjzLc+5bmdZhejw9WyCYAYgeA",
         "source": "test/output/example.js"
       },
       "test/output/example.js.map": {
         "etag": "cb342b2c6d735815d8e4e7cbde0aa369",
         "file": "test/output/example.map",
-        "integrity": "1KaNWheI8TZhtGHASFaPrXP+V31dIRKhtp1tWSJQ/tw25LcmrK3WgLJ0/ta+QB4r",
+        "integrity": "sha384-1KaNWheI8TZhtGHASFaPrXP+V31dIRKhtp1tWSJQ/tw25LcmrK3WgLJ0/ta+QB4r",
         "source": "test/output/example.js.map"
       }
     },
@@ -692,7 +692,7 @@ test('it should include the manifest file as part of the build result output fil
       "file": "test/output/example.js",
       "source": "test/output/example.js",
       "etag": "8b32f0f575840a2bec26a61625eaca2a",
-      "integrity": "/C84a5gTs27+9oa3Gr1HfuQ5tz7IPGZpI88NOiBJtiygOsxHUA/ytMn97r+OOs1J",
+      "integrity": "sha384-/C84a5gTs27+9oa3Gr1HfuQ5tz7IPGZpI88NOiBJtiygOsxHUA/ytMn97r+OOs1J",
     }
   };
 
@@ -722,7 +722,7 @@ test('it should modify result using generate function', async () => {
       "test/output/example.js": {
         "etag": "b10922b033167718e2b3031052833770",
         "file": "test/output/example.js",
-        "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+        "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
         "source": "test/output/example.js",
       },
     }
@@ -767,7 +767,7 @@ test('it should use the same extension as the output when it is changed via the 
     "test/output/example.mjs": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "test/output/example.mjs",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/output/example.mjs",
     },
   });
@@ -780,7 +780,7 @@ test('it should use the same extension as the entry with useEntrypointKeys optio
     "test/input/example.js": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "test/output/example.mjs",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/input/example.js",
     },
   });
@@ -796,7 +796,7 @@ test('it should use the same extension as the entry with useEntrypointKeys optio
     "test/input/example.ts": {
       "etag": "b8e7263e946f16015d9d6db02f3ea3b1",
       "file": "test/output/example.js",
-      "integrity": "hTC9oniqF+c+oZF7Ih9oq7MrmKdpzzzK9/fAvd+TzCYsZ5M3PDNSXGzL2yMh42fD",
+      "integrity": "sha384-hTC9oniqF+c+oZF7Ih9oq7MrmKdpzzzK9/fAvd+TzCYsZ5M3PDNSXGzL2yMh42fD",
       "source": "test/input/example.ts",
     },
   });
@@ -812,7 +812,7 @@ test('it should use the same extension as the entry with useEntrypointKeys optio
     "test/input/example.js": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "test/output/out.mjs",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/input/example.js",
     },
   });
@@ -854,7 +854,7 @@ test('it is able to use extensionless=output along with useEntrypointKeys', asyn
     "test/input/example.js": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "test/output/example",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/input/example.js",
     },
   });
@@ -871,13 +871,13 @@ test('it should retain a previous key with append=true option', async () => {
     "test/output/example.js": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "test/output/example.js",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/output/example.js",
     },
     "test/output/index.js": {
       "etag": "4694eb03ef8c45e99982c1498c14b5d7",
       "file": "test/output/index.js",
-      "integrity": "bxjaJQy+wK5iAuw4M2hS7WVPApv9sSfXyDSrlxL6ZcK2Io774FFqHhRP1HRSvy0R",
+      "integrity": "sha384-bxjaJQy+wK5iAuw4M2hS7WVPApv9sSfXyDSrlxL6ZcK2Io774FFqHhRP1HRSvy0R",
       "source": "test/output/index.js",
     },
   });
@@ -893,7 +893,7 @@ test('it should overwrite a previous key with append=true option if its been upd
     "test/output/example.js": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "test/output/example.js",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/output/example.js",
     }
   });
@@ -906,7 +906,7 @@ test('it should not throw an error if there is no preexisting file with append=t
     "test/output/example.js": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "test/output/example.js",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/output/example.js",
     }
   });
@@ -920,13 +920,13 @@ test('it supports multiple output formats by using append=true and running esbui
     "test/output/example.cjs": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "test/output/example.cjs",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/output/example.cjs",
     },
     "test/output/example.mjs": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "test/output/example.mjs",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/output/example.mjs",
     },
   });
@@ -939,7 +939,7 @@ test('it should keep the file when filter function returns true', async () => {
     "test/output/example.js": {
       "etag": "b10922b033167718e2b3031052833770",
       "file": "test/output/example.js",
-      "integrity": "g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
+      "integrity": "sha384-g9fnNEI81bgIE1qEBZAG4T/fEcHlNyHJoBu3XUvKAG3nOeMU8rJ61B/3PV+Vc48I",
       "source": "test/output/example.js",
     }
   });
@@ -961,13 +961,13 @@ test('it should use the hashed filename of chunks as keys when splitting is enab
   expect(metafileContents()['test/output/chunk-JYYV63CZ.js']).toEqual({
     "etag": "e34f96e82507dfc22c45ee0a90877f7f",
     "file": "test/output/chunk-JYYV63CZ.js",
-    "integrity": "4B/PkotLJjUpXQFN5rYtHqC0Me2J6iBt3Tv9UKRx3KG5j6Mr5X5s3AqoP8UFCR0l",
+    "integrity": "sha384-4B/PkotLJjUpXQFN5rYtHqC0Me2J6iBt3Tv9UKRx3KG5j6Mr5X5s3AqoP8UFCR0l",
     "source": "test/output/chunk-JYYV63CZ.js"
   });
   expect(metafileContents()['test/output/chunk-VDNVJE6B.js']).toEqual({
     "etag": "8d45703784911efab7b1e53b9365389b",
     "file": "test/output/chunk-VDNVJE6B.js",
-    "integrity": "dpcsqKCEcpcoFjMdaxSOmLaLEwf5+/JBgUClpN3jnpq1vyMU15p3YePEI+MIJPsk",
+    "integrity": "sha384-dpcsqKCEcpcoFjMdaxSOmLaLEwf5+/JBgUClpN3jnpq1vyMU15p3YePEI+MIJPsk",
     "source": "test/output/chunk-VDNVJE6B.js"
   });
 });
