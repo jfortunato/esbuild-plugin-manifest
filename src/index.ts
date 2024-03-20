@@ -9,10 +9,37 @@ import path from 'path';
 import util from 'util';
 import lockfile from 'proper-lockfile';
 
+import {createHash} from 'crypto';
+
 type OptionValue = boolean | 'input' | 'output';
 
+class Mapping {
+  input: string;
+  output: string;
+  inputOriginal: string;
+  outputOriginal: string;
+
+  constructor(input: string, output: string, inputOriginal: string, outputOriginal: string) {
+    this.input = input;
+    this.output = output;
+    this.inputOriginal = inputOriginal;
+    this.outputOriginal = outputOriginal;
+  }
+
+  toString() {
+    return `Input: ${this.input} (original ${this.inputOriginal}), Output: ${this.output} (original ${this.outputOriginal})`;
+  }
+}
+
+interface ManifestEntry {
+  file: string,
+  source: string,
+  integrity: string,
+  etag: string,
+}
+
 interface ManifestEntries {
-  [key: string]: string
+  [key: string]: ManifestEntry
 }
 
 interface ManifestPluginOptions {
@@ -44,7 +71,7 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
       }
 
       // we'll map the input entry point filename to the output filename
-      const mappings = new Map<string, string>();
+      const mappings = new Map<string, Mapping>();
 
       if (!result.metafile) {
         throw new Error("Expected metafile, but it does not exist.");
@@ -60,16 +87,16 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         output = shouldModify('output', options.extensionless) ? extensionless(output) : output;
 
         // When shortNames are enabled, there can be conflicting filenames.
-        // For example if the entry points are ['src/pages/home/index.js', 'src/pages/about/index.js'] both of the
+        // For example, if the entry points are ['src/pages/home/index.js', 'src/pages/about/index.js'] both of the
         // short names will be 'index.js'. We'll just throw an error if a conflict is detected.
         //
-        // There are also other scenarios that can cause a conflicting filename so we'll just ensure that the key
+        // There are other scenarios that can cause a conflicting filename, so we'll just ensure that the key
         // we're trying to add doesn't already exist.
         if (mappings.has(input)) {
           throw new Error(`There is a conflicting manifest key for '${input}'. First conflicting output: '${mappings.get(input)}'. Second conflicting output: '${output}'.`);
         }
 
-        mappings.set(input, output);
+        mappings.set(input, new Mapping(input, output, inputFilename, outputFilename));
       }
 
       for (const outputFilename in result.metafile.outputs) {
@@ -77,7 +104,7 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         let key = unhashed(outputFilename);
 
         // When code splitting is used, every chunk will be named "chunk.HASH.js". That means when there are multiple chunks,
-        // every unhashed filename would be "chunk.js", which would cause a conflict in the manifest. So for chunks we'll just
+        // every unhashed filename would be "chunk.js", which would cause a conflict in the manifest. So, for chunks, we'll just
         // use the output filename including the hash as the key.
         if (path.parse(key).name === 'chunk') {
           key = outputFilename;
@@ -101,12 +128,13 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
 
       const fullPath = pathToManifest(build.initialOptions, options);
 
-      // If the append option is used, we'll read the existing manifest file and merge it with the new entries.
-      let existingManifest: {[key: string]: string} = {};
+      // If the `append` option is used, we'll read the existing manifest file and merge it with the new entries.
+      let existingManifest: { [key: string]: ManifestEntry } = {};
       if (options.append) {
         try {
           existingManifest = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
-        } catch (e) { }
+        } catch (e) {
+        }
       }
 
       const entries = fromEntries(mappings, existingManifest);
@@ -193,7 +221,7 @@ const ensureFile = async (fullPath: string): Promise<void> => {
   }
 };
 
-const shouldModify = (inputOrOutput: 'input'|'output', optionValue?: OptionValue): boolean => {
+const shouldModify = (inputOrOutput: 'input' | 'output', optionValue?: OptionValue): boolean => {
   return optionValue === inputOrOutput || optionValue === true;
 };
 
@@ -221,16 +249,26 @@ const extensionless = (value: string): string => {
 const unhashed = (value: string): string => {
   const parsed = path.parse(value);
 
-  // esbuild uses [A-Z0-9]{8} as the hash, and that is not currently configurable so we will match that exactly
+  // esbuild uses [A-Z0-9]{8} as the hash, and that is not currently configurable, so we will match that exactly
   // along with any preceding character that may be a dot or a dash
   const unhashedName = parsed.name.replace(new RegExp(`[-\.]?[A-Z0-9]{8}`), '');
 
   return path.join(parsed.dir, unhashedName + parsed.ext);
 };
 
-const fromEntries = (map: Map<string, string>, mergeWith: ManifestEntries): ManifestEntries => {
+const integrity = (fileContent: Buffer | string): string => {
+  const algorithm = "sha384";
+  const hash = createHash(algorithm).update(fileContent).digest("base64");
+  return `${algorithm}-${hash}`;
+};
+
+const etag = (fileContent: Buffer | string): string => {
+  return createHash("md5").update(fileContent).digest("hex");
+}
+
+const fromEntries = (map: Map<string, Mapping>, mergeWith: ManifestEntries): ManifestEntries => {
   const obj = Array.from(map).reduce((obj: ManifestEntries, [key, value]) => {
-    obj[key] = value;
+    obj[key] = toManifestEntry(value);
     return obj;
   }, {});
 
@@ -241,7 +279,21 @@ const filterEntries = (entries: ManifestEntries, filterFunction: any): ManifestE
   return Object.keys(entries)
     .filter(filterFunction)
     .reduce((obj: ManifestEntries, key) => {
-      obj[key] = entries[key] as string;
+      obj[key] = entries[key] as ManifestEntry;
       return obj;
     }, {});
 };
+
+const toManifestEntry = (mapping: Mapping): ManifestEntry => {
+  // If the output file does not exist, it is probably because esbuild ran with the `write=false` option.
+  // In that case, to at least have some stable value to hash, we will use the file name.
+  const fileContent = fs.existsSync(mapping.outputOriginal)
+    ? fs.readFileSync(mapping.outputOriginal)
+    : mapping.outputOriginal;
+  return {
+    file: mapping.output,
+    source: mapping.inputOriginal,
+    integrity: integrity(fileContent),
+    etag: etag(fileContent),
+  };
+}
