@@ -78,8 +78,10 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
 
         // When code splitting is used, every chunk will be named "chunk.HASH.js". That means when there are multiple chunks,
         // every unhashed filename would be "chunk.js", which would cause a conflict in the manifest. So for chunks we'll just
-        // use the output filename including the hash as the key.
-        if (path.parse(key).name === 'chunk') {
+        // use the output filename including the hash as the key. The same goes for sourcemaps for chunks - those will also be
+        // named "chunk.HASH.js.map".
+        // By parsing the output filename twice, we get rid of the any double extension (like .js.map) if present. Non-map files are left intact.
+        if (path.parse(path.parse(key).name).name === 'chunk') { 
           key = outputFilename;
         }
 
