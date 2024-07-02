@@ -535,3 +535,15 @@ test('it should use the hashed filename of chunks as keys when splitting is enab
   expect(metafileContents()['test/output/chunk-JYYV63CZ.js']).toEqual('test/output/chunk-JYYV63CZ.js');
   expect(metafileContents()['test/output/chunk-VDNVJE6B.js']).toEqual('test/output/chunk-VDNVJE6B.js');
 });
+
+test('it should use the hashed filename of chunks sourcemaps as keys when splitting is enabled', async () => {
+  await require('esbuild').build(buildOptions({}, {
+    entryPoints: ['test/input/splitting/index.js', 'test/input/splitting/home.js', 'test/input/splitting/about.js'],
+    splitting: true,
+    sourcemap: true,
+    format: 'esm',
+  }));
+
+  expect(metafileContents()['test/output/chunk-GLLCI6N7.js.map']).toEqual('test/output/chunk-GLLCI6N7.js.map');
+  expect(metafileContents()['test/output/chunk-4GJGTIT2.js.map']).toEqual('test/output/chunk-4GJGTIT2.js.map');
+});
