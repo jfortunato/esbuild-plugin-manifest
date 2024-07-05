@@ -1,9 +1,3 @@
-## [1.0.3](https://github.com/jfortunato/esbuild-plugin-manifest/compare/v1.0.2...v1.0.3) (2024-02-07)
-
-
-### Bug Fixes
-
-* Don't throw a conflict error when code splitting is used ([daf1bf6](https://github.com/jfortunato/esbuild-plugin-manifest/commit/daf1bf6d16448bc5f0c2bcd65354f5878cfa1cb1))
 
 ## [1.0.4](https://github.com/jfortunato/esbuild-plugin-manifest/compare/v1.0.3...v1.0.4) (2024-07-05)
 
@@ -11,6 +5,13 @@
 ### Miscellaneous Chores
 
 * release 1.0.4 ([346041b](https://github.com/jfortunato/esbuild-plugin-manifest/commit/346041bcaa059f1e42e6f0d9541056f1c4b102f2))
+
+## [1.0.3](https://github.com/jfortunato/esbuild-plugin-manifest/compare/v1.0.2...v1.0.3) (2024-02-07)
+
+
+### Bug Fixes
+
+* Don't throw a conflict error when code splitting is used ([daf1bf6](https://github.com/jfortunato/esbuild-plugin-manifest/commit/daf1bf6d16448bc5f0c2bcd65354f5878cfa1cb1))
 
 ## [1.0.2](https://github.com/jfortunato/esbuild-plugin-manifest/compare/v1.0.1...v1.0.2) (2023-12-13)
 
