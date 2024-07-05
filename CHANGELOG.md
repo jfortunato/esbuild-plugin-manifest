@@ -1,3 +1,11 @@
+
+## [1.0.4](https://github.com/jfortunato/esbuild-plugin-manifest/compare/v1.0.3...v1.0.4) (2024-07-05)
+
+
+### Miscellaneous Chores
+
+* release 1.0.4 ([346041b](https://github.com/jfortunato/esbuild-plugin-manifest/commit/346041bcaa059f1e42e6f0d9541056f1c4b102f2))
+
 ## [1.0.3](https://github.com/jfortunato/esbuild-plugin-manifest/compare/v1.0.2...v1.0.3) (2024-02-07)
 
 
