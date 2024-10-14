@@ -1,3 +1,9 @@
+## [1.0.5](https://github.com/jfortunato/esbuild-plugin-manifest/compare/v1.0.4...v1.0.5) (2024-10-14)
+
+
+### Bug Fixes
+
+* Fix issues when using the append option while watching multiple builds ([d621b08](https://github.com/jfortunato/esbuild-plugin-manifest/commit/d621b08018849e700ca655721cea37be579ce21b)), closes [#28](https://github.com/jfortunato/esbuild-plugin-manifest/issues/28)
 
 ## [1.0.4](https://github.com/jfortunato/esbuild-plugin-manifest/compare/v1.0.3...v1.0.4) (2024-07-05)
 
