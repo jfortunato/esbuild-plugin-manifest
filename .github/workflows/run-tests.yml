@@ -9,10 +9,10 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [ 18.x, 20.x, latest ]
+        node-version: [ 18.x, 20.x, latest]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
@@ -21,6 +21,6 @@ jobs:
       - run: yarn build
       - run: yarn test:coverage
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
