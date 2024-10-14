@@ -394,6 +394,7 @@ test('it should include the manifest file as part of the build result output fil
   const expected = {
     path: path.resolve(OUTPUT_MANIFEST),
     contents: new util.TextEncoder().encode(expectedText),
+    hash: "61b660e9d4084e594c725b307bf4ed395880342738e9b78c6f66f44b1a08e5cb",
     text: expectedText,
   };
 
@@ -532,8 +533,8 @@ test('it should use the hashed filename of chunks as keys when splitting is enab
     format: 'esm',
   }));
 
-  expect(metafileContents()['test/output/chunk-JYYV63CZ.js']).toEqual('test/output/chunk-JYYV63CZ.js');
-  expect(metafileContents()['test/output/chunk-VDNVJE6B.js']).toEqual('test/output/chunk-VDNVJE6B.js');
+  expect(metafileContents()['test/output/chunk-YJHBKB32.js']).toEqual('test/output/chunk-YJHBKB32.js');
+  expect(metafileContents()['test/output/chunk-CGERAYKX.js']).toEqual('test/output/chunk-CGERAYKX.js');
 });
 
 test('it should use the hashed filename of chunks sourcemaps as keys when splitting is enabled', async () => {
@@ -544,6 +545,6 @@ test('it should use the hashed filename of chunks sourcemaps as keys when splitt
     format: 'esm',
   }));
 
-  expect(metafileContents()['test/output/chunk-GLLCI6N7.js.map']).toEqual('test/output/chunk-GLLCI6N7.js.map');
-  expect(metafileContents()['test/output/chunk-4GJGTIT2.js.map']).toEqual('test/output/chunk-4GJGTIT2.js.map');
+  expect(metafileContents()['test/output/chunk-VKLVG2YY.js.map']).toEqual('test/output/chunk-VKLVG2YY.js.map');
+  expect(metafileContents()['test/output/chunk-32OWP2O4.js.map']).toEqual('test/output/chunk-32OWP2O4.js.map');
 });

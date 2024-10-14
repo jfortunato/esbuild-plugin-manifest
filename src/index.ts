@@ -8,6 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import util from 'util';
 import lockfile from 'proper-lockfile';
+import crypto from 'crypto';
 
 type OptionValue = boolean | 'input' | 'output';
 
@@ -126,6 +127,8 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         result.outputFiles?.push({
           path: fullPath,
           contents: new util.TextEncoder().encode(text),
+          // esbuild currently uses xxHash64 for hashing, but I'd rather avoid an additional dependency, so I'll just use node's sha256 hash function.
+          hash: crypto.createHash('sha256').update(text).digest('hex'),
           get text() {
             return text;
           }
