@@ -104,26 +104,13 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
 
       const fullPath = pathToManifest(build.initialOptions, options);
 
-      // If the append option is used, we'll read the existing manifest file and merge it with the new entries.
-      let existingManifest: {[key: string]: string} = {};
-      if (options.append) {
-        try {
-          existingManifest = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
-        } catch (e) { }
-      }
-
-      const entries = fromEntries(mappings, existingManifest);
-
-      const filteredEntries = options.filter ? filterEntries(entries, options.filter) : entries;
-
-      const resultObj = options.generate ? options.generate(filteredEntries) : filteredEntries;
-
-      const text = JSON.stringify(resultObj, null, 2);
-
       // With the esbuild write=false option, nothing will be written to disk. Instead, the build
       // result will have an "outputFiles" property containing all the files that would have been written.
       // We want to add the manifest file as one of those "outputFiles".
       if (build.initialOptions.write === false) {
+        const resultObj = generateEntriesResultObject(fullPath, mappings, options);
+        const text = JSON.stringify(resultObj, null, 2);
+
         result.outputFiles?.push({
           path: fullPath,
           contents: new util.TextEncoder().encode(text),
@@ -137,7 +124,7 @@ export = (options: ManifestPluginOptions = {}): Plugin => ({
         return;
       }
 
-      return writeFileWithLock(fullPath, text);
+      return writeFileWithLock(fullPath, mappings, options);
     });
   }
 });
@@ -159,7 +146,23 @@ const pathToManifest = (initialOptions: BuildOptions, pluginOptions: ManifestPlu
   return path.resolve(outdir, filename);
 };
 
-const writeFileWithLock = async (fullPath: string, text: string): Promise<void> => {
+const generateEntriesResultObject = (fullPathToManifest: string, mappings: Map<string, string>, options: ManifestPluginOptions): Object => {
+  // If the append option is used, we'll read the existing manifest file and merge it with the new entries.
+  let existingManifest: {[key: string]: string} = {};
+  if (options.append) {
+    try {
+      existingManifest = JSON.parse(fs.readFileSync(fullPathToManifest, 'utf8'));
+    } catch (e) { }
+  }
+
+  const entries = fromEntries(mappings, existingManifest);
+
+  const filteredEntries = options.filter ? filterEntries(entries, options.filter) : entries;
+
+  return options.generate ? options.generate(filteredEntries) : filteredEntries;
+};
+
+const writeFileWithLock = async (fullPath: string, mappings: Map<string, string>, options: ManifestPluginOptions): Promise<void> => {
   // Retry up to 5 times, using exponential backoff but capped at 100ms between retries
   // See: https://github.com/tim-kos/node-retry#retrytimeoutsoptions for an explanation of the options
   const retryOptions = {
@@ -173,8 +176,10 @@ const writeFileWithLock = async (fullPath: string, text: string): Promise<void> 
   try {
     // Ensure the file exists before we try to lock it
     await ensureFile(fullPath);
-    // Lock the file, write the contents, then release the lock
+    // Lock the file, generate the final entries, write the contents, then release the lock
     const release = await lockfile.lock(fullPath, retryOptions);
+    const resultObj = generateEntriesResultObject(fullPath, mappings, options);
+    const text = JSON.stringify(resultObj, null, 2);
     await fs.promises.writeFile(fullPath, text);
     await release();
   } catch (e) {

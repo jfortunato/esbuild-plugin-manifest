@@ -548,3 +548,16 @@ test('it should use the hashed filename of chunks sourcemaps as keys when splitt
   expect(metafileContents()['test/output/chunk-VKLVG2YY.js.map']).toEqual('test/output/chunk-VKLVG2YY.js.map');
   expect(metafileContents()['test/output/chunk-32OWP2O4.js.map']).toEqual('test/output/chunk-32OWP2O4.js.map');
 });
+
+test('it supports multiple output formats by using append=true while esbuild is watching the files', async () => {
+  const ctx1 = await require('esbuild').context(buildOptions({hash: false, append: true}, {outExtension: {'.js': '.mjs'}}));
+  const ctx2 = await require('esbuild').context(buildOptions({hash: false, append: true}, {outExtension: {'.js': '.cjs'}}));
+
+  await ctx1.watch();
+  await ctx2.watch();
+
+  await ctx1.dispose();
+  await ctx2.dispose();
+
+  expect(metafileContents()).toEqual({'test/output/example.mjs': 'test/output/example.mjs', 'test/output/example.cjs': 'test/output/example.cjs'});
+});
