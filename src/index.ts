@@ -192,7 +192,7 @@ const writeFileWithLock = async (fullPath: string, mappings: Map<string, string>
 const ensureFile = async (fullPath: string): Promise<void> => {
   try {
     await fs.promises.access(fullPath)
-  } catch (err) {
+  } catch (err: any) {
     // If the error is not that the file does not exist, rethrow it
     if (err.code !== 'ENOENT') {
       throw err;

@@ -97,7 +97,7 @@ test('it should throw an error when there are conflicting short names', async ()
 
   try {
     await require('esbuild').build(buildOptions({shortNames: true}, {entryPoints: ['test/input/pages/home/index.js', 'test/input/pages/about/index.js']}));
-  } catch (e) {
+  } catch (e: any) {
     expect(e.message).toMatch(/conflicting/);
   }
 
@@ -121,7 +121,7 @@ test('it should throw an error if there are conflicting outputs when the shortNa
 
   try {
     await require('esbuild').build(buildOptions({hash: false, shortNames: 'output'}, {entryPoints: ['test/input/pages/about/index.js', 'test/input/pages/about/index.ts']}));
-  } catch (e) {
+  } catch (e: any) {
     // esbuild itself should throw an error
     expect(e.message).toMatch(/share the same path/);
   }
@@ -134,7 +134,7 @@ test('it should throw an error if the shortname has a different extension but ex
 
   try {
     await require('esbuild').build(buildOptions({hash: false, shortNames: true, extensionless: true}, {entryPoints: ['test/input/pages/home/index.js', 'test/input/pages/about/index.ts']}));
-  } catch (e) {
+  } catch (e: any) {
     expect(e.message).toMatch(/conflicting/);
   }
 
@@ -159,7 +159,7 @@ test('it should throw an error if building without an outdir or outfile', async 
 
   try {
     await require('esbuild').build(buildOptions({}, {outdir: undefined, outfile: undefined}));
-  } catch (e) {
+  } catch (e: any) {
     expect(e.message).toMatch(/outdir/);
   }
 });
@@ -262,7 +262,7 @@ test('it should throw an error when a css sibling conflicts with a css entrypoin
 
   try {
     await require('esbuild').build(buildOptions({}, {entryPoints: ['test/input/example-with-css/example.js', 'test/input/example-with-css/example.css']}));
-  } catch (e) {
+  } catch (e: any) {
     expect(e.message).toMatch(/conflicting/);
   }
 });
@@ -314,7 +314,7 @@ test('it should throw an error if the extensionless option is used with bundled 
 
   try {
     await require('esbuild').build(buildOptions({hash: false, extensionless: 'input'}, {entryPoints: ['test/input/example-with-css/example.js']}));
-  } catch (e) {
+  } catch (e: any) {
     expect(e.message).toMatch(/conflicting manifest key.+example\.js.+example\.css/);
   }
 });
@@ -410,7 +410,7 @@ test('it should modify result using generate function', async () => {
 test('it should only generate the manifest when the build result contains no errors', async () => {
   try {
     await require('esbuild').build(buildOptions({}, {entryPoints: ['test/input/example-with-error.js']}));
-  } catch (e) {
+  } catch (e: any) {
     // We should expect only 1 BuildFailure error from the source file, we don't want our plugin to throw its own error
     expect(e.errors.length).toBe(1);
   }
@@ -467,7 +467,7 @@ test.each(['input', true])('it should not throw an error when using the useEntry
 
   try {
     await require('esbuild').build(buildOptions({hash: false, useEntrypointKeys: true, extensionless: extensionlessOption}));
-  } catch (e) {
+  } catch (e: any) {
     // Just check that the error message mentions both options
     expect(e.message).toMatch(/useEntrypointKeys.+extensionless/);
   }
