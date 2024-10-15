@@ -202,12 +202,17 @@ esbuild.build({
     // The `entries` object is what the contents of the manifest would normally be without using a custom `generate` function.
     // It is a string to string mapping of the original asset name to the output file name.
     generate: (entries) => {
-      // `file`, `source`, and `integrity` are all arbitrarily named and can be anything you want.
-      return Object.entries(entries).map(([source, file]) => ({
-        file: file,
-        source: source,
-        integrity: "sha384-" + createHash('sha384').update(file).digest('base64'),
-      }));
+      const manifest = {};
+
+      for (const [source, file] of Object.entries(entries)) {
+        manifest[source] = {
+          // `file` and `integrity` are arbitrary names and can be anything you want.
+          file: file,
+          integrity: "sha384-" + createHash('sha384').update(file).digest('base64'),
+        };
+      }
+
+      return manifest;
     },
   })],
 }).catch((e) => console.error(e.message))
@@ -215,11 +220,10 @@ esbuild.build({
 
 ```json5
 // manifest.json
-[
-  {
+{
+  "output/index.js": {
     "file": "output/index-4QTUNIID.js",
-    "source": "output/index.js",
-    "integrity": "sha384-<hash>"
+    "integrity": "sha384-<hash>",
   }
-]
+}
 ```
