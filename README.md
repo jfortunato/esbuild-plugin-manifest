@@ -109,7 +109,7 @@ By default, we will overwrite the manifest file if it already exists. This optio
 ```js
 // build.js
 const esbuild = require('esbuild');
-const manifestPlugin = require('esbuild-plugin-manifest')
+const manifestPlugin = require('esbuild-plugin-manifest');
 
 esbuild.build({
   entryPoints: ['src/index.ts'],
@@ -131,7 +131,7 @@ esbuild.build({
 ```js
 // build.js
 const esbuild = require('esbuild');
-const manifestPlugin = require('esbuild-plugin-manifest')
+const manifestPlugin = require('esbuild-plugin-manifest');
 
 esbuild.build({
   entryPoints: ['src/index.ts'],
@@ -182,4 +182,44 @@ await esbuild.build({
   "output/index.js": "output/index-4QTUNIID.js",
   "output/index.mjs": "output/index-5RUVOJJE.mjs"
 }
+```
+
+### Subresource Integrity
+
+To generate a manifest with subresource integrity hashes, you can use the `generate` option to create a manifest with the hashes.
+
+```js
+// build.js
+const esbuild = require('esbuild');
+const manifestPlugin = require('esbuild-plugin-manifest');
+const {createHash} = require('crypto');
+
+esbuild.build({
+  entryPoints: ['src/index.js'],
+  bundle: true,
+  outdir: 'output/',
+  plugins: [manifestPlugin({
+    // The `entries` object is what the contents of the manifest would normally be without using a custom `generate` function.
+    // It is a string to string mapping of the original asset name to the output file name.
+    generate: (entries) => {
+      // `file`, `source`, and `integrity` are all arbitrarily named and can be anything you want.
+      return Object.entries(entries).map(([source, file]) => ({
+        file: file,
+        source: source,
+        integrity: "sha384-" + createHash('sha384').update(file).digest('base64'),
+      }));
+    },
+  })],
+}).catch((e) => console.error(e.message))
+```
+
+```json5
+// manifest.json
+[
+  {
+    "file": "output/index-4QTUNIID.js",
+    "source": "output/index.js",
+    "integrity": "sha384-<hash>"
+  }
+]
 ```
